@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: carelink-backend
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/dummy
+    username: dummy
+    password: dummy
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: none
