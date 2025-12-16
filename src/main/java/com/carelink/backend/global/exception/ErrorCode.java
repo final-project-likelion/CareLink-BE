@@ -16,6 +16,10 @@ public enum ErrorCode {
     // 유저 관련
     DUPLICATED_PHONE_NUMBER(HttpStatus.BAD_REQUEST, "이미 존재하는 전화번호입니다"),
 
+    // STT 관련
+    STT_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "음성 -> 텍스트 추출에 실패했습니다."),
+    STT_TOO_LARGE(HttpStatus.BAD_REQUEST, "파일 용량/길이가 너무 큽니다."),
+
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "잘못된 입력값입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다.");
 
