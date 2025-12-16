@@ -66,13 +66,4 @@ public class JwtProvider {
         return Long.valueOf(parseClaims(token).getSubject());
     }
 
-    public boolean validateToken(String token) {
-        try {
-            parseClaims(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
 }

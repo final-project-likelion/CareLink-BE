@@ -90,4 +90,17 @@ public class AuthService {
         return tokens;
     }
 
+    /** access token 만료 시 토큰 재발급 */
+    public TokenDto reissue(String refreshToken) {
+        Long userIdFromToken = jwtProvider.getUserIdFromToken(refreshToken);
+
+        RefreshToken refreshtoken = refreshTokenRepository.findByUserId(userIdFromToken)
+                .orElseThrow(() -> new BaseException(ErrorCode.TOKEN_NOT_FOUND, "해당 사용자 id의 refresh token을 찾을 수 없습니다."));
+
+        if (!refreshtoken.getRefreshToken().equals(refreshToken))
+            throw new BaseException(ErrorCode.INVALID_TOKEN, "refresh token 값이 올바르지 않습니다.");
+
+        return createAndSaveToken(userIdFromToken);
+    }
+
 }

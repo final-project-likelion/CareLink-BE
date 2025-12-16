@@ -34,4 +34,11 @@ public class AuthController {
                 .body(BaseResponse.success("로그인에 성공했습니다", tokens));
     }
 
+    @PostMapping("/reissue")
+    public ResponseEntity<BaseResponse<?>> reissue(@RequestBody String refreshToken) {
+        TokenDto tokens = authService.reissue(refreshToken);
+        return ResponseEntity.ok()
+                .body(BaseResponse.success(tokens));
+    }
+
 }
