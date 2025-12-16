@@ -52,9 +52,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 request.setAttribute("exceptionCode", ErrorCode.EXPIRED_TOKEN);
                 request.setAttribute("exceptionMessage", e.getMessage());
             }
-        } else {
-            request.setAttribute("exceptionCode", ErrorCode.AUTH_REQUIRED);
-            request.setAttribute("exceptionMessage", "토큰 인증이 필요합니다.");
         }
         filterChain.doFilter(request, response);
     }
