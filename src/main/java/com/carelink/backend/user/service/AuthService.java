@@ -1,10 +1,15 @@
 package com.carelink.backend.user.service;
 
+import com.carelink.backend.global.config.JwtProvider;
 import com.carelink.backend.global.exception.BaseException;
 import com.carelink.backend.global.exception.ErrorCode;
 import com.carelink.backend.user.Category;
+import com.carelink.backend.user.dto.LoginDto;
 import com.carelink.backend.user.dto.SignUpDto;
+import com.carelink.backend.user.dto.TokenDto;
+import com.carelink.backend.user.entity.RefreshToken;
 import com.carelink.backend.user.entity.User;
+import com.carelink.backend.user.repository.RefreshTokenRepository;
 import com.carelink.backend.user.repository.UserRepository;
 import com.carelink.backend.userInterest.entity.UserInterest;
 import com.carelink.backend.userInterest.repository.UserInterestRepository;
@@ -13,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -20,6 +27,8 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserInterestRepository userInterestRepository;
+    private final JwtProvider jwtProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
     public Long signUp(SignUpDto signUpDto) {
@@ -50,6 +59,35 @@ public class AuthService {
 
         return savedUser.getId();
 
+    }
+
+    public TokenDto login(LoginDto loginDto) {
+        User user = userRepository.findByPhoneNum(loginDto.getPhoneNum())
+                .orElseThrow(() -> new BaseException(ErrorCode.UNAUTHORIZED, "잘못된 아이디 또는 비밀번호입니다"));
+
+        if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword()))
+            throw new BaseException(ErrorCode.UNAUTHORIZED, "잘못된 아이디 또는 비밀번호입니다");
+        else {
+            TokenDto tokens = createAndSaveToken(user.getId());
+            return tokens;
+        }
+    }
+
+    /** access / refresh 토큰 생성 및 refresh token 저장 */
+    @Transactional
+    public TokenDto createAndSaveToken(Long userId) {
+        TokenDto tokens = jwtProvider.createTokens(userId);
+
+        refreshTokenRepository.findByUserId(userId)
+                .ifPresentOrElse(
+                        rt -> {
+                            rt.updateRefreshToken(tokens.getRefreshToken());
+                            refreshTokenRepository.save(rt);
+                        }, () -> {
+                            refreshTokenRepository.save(RefreshToken.builder().userId(userId).refreshToken(tokens.getRefreshToken()).build());
+                        }
+                );
+        return tokens;
     }
 
 }
