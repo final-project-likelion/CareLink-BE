@@ -60,12 +60,12 @@ public class GlobalExceptionHandler {
                 .body(BaseResponse.error(ErrorCode.INVALID_INPUT_VALUE, "잘못된 쿼리 파라미터 값입니다."));
     }
 
-    // 잘못된 Enum 값인 경우
+    // 요청 바디가 비어있거나 JSON 형식이 올바르지 않거나 매핑에 실패한 경우 (ex. 잘못된 Enum값)
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<BaseResponse<?>> handleEnumParseError(HttpMessageNotReadableException e) {
         return ResponseEntity
                 .status(ErrorCode.INVALID_INPUT_VALUE.getStatus())
-                .body(BaseResponse.error(ErrorCode.INVALID_INPUT_VALUE, "잘못된 Enum값입니다."));
+                .body(BaseResponse.error(ErrorCode.INVALID_INPUT_VALUE, "요청 바디가 비어있거나 JSON 형식이 올바르지 않거나 매핑에 실패했습니다."));
     }
 
 }
