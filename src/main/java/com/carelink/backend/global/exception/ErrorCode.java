@@ -20,6 +20,13 @@ public enum ErrorCode {
     STT_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "음성 -> 텍스트 추출에 실패했습니다."),
     STT_TOO_LARGE(HttpStatus.BAD_REQUEST, "파일 용량/길이가 너무 큽니다."),
 
+    // 외부 API (fastAPI ..) 관련
+    EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "채팅 응답 과정에서 오류가 발생했습니다."),
+
+    // 채팅 관련
+    CHAT_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "채팅 저장 과정에서 오류가 발생했습니다."),
+    JSON_MAPPING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 매핑에 실패했습니다."),
+
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "잘못된 입력값입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다.");
 
