@@ -6,6 +6,7 @@ import com.carelink.backend.chat.service.ChatService;
 import com.carelink.backend.chat.service.SttService;
 import com.carelink.backend.global.response.BaseResponse;
 import com.carelink.backend.user.entity.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,7 +29,7 @@ public class ChatController {
     }
 
     @PostMapping("/chat")
-    public ResponseEntity<BaseResponse<?>> generateResponse(@RequestBody ChatRequestDto chatRequestDto,
+    public ResponseEntity<BaseResponse<?>> generateResponse(@Valid @RequestBody ChatRequestDto chatRequestDto,
                                                             @AuthenticationPrincipal User user) {
         String response = chatService.generateResponse(user.getId(), chatRequestDto);
         return ResponseEntity.ok()
