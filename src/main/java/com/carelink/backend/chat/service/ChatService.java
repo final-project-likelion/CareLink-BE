@@ -2,6 +2,8 @@ package com.carelink.backend.chat.service;
 
 import com.carelink.backend.chat.dto.AIChatResponseDto;
 import com.carelink.backend.chat.dto.ChatRequestDto;
+import com.carelink.backend.chat.dto.ChatRoomDto;
+import com.carelink.backend.chat.dto.ConversationDto;
 import com.carelink.backend.global.exception.BaseException;
 import com.carelink.backend.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,6 +29,7 @@ public class ChatService {
 
     private final ChatRedisService chatRedisService;
 
+    /** 응답 생성 */
     public String generateResponse(Long userId, ChatRequestDto chatRequestDto) {
         String question = chatRequestDto.getQuestion();
 
@@ -62,6 +67,19 @@ public class ChatService {
         chatRedisService.saveQnA(userId, question, response);
 
         return response;
+    }
+
+    /** 채팅방 조회 */
+    public ChatRoomDto getChatRoom(Long userId) {
+        // TODO: 약 복용, 퀴즈, 컨디션 체크 여부 반환
+
+        List<ConversationDto> allConversationsByUserId = chatRedisService.getAllQnasByUserId(userId);
+
+        return ChatRoomDto.builder()
+                .isMedicineChecked(true)
+                .isConditionChecked(true)
+                .isQuizChecked(true)
+                .conversations(allConversationsByUserId).build();
     }
 
 }

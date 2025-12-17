@@ -26,6 +26,7 @@ public enum ErrorCode {
     // 채팅 관련
     CHAT_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "채팅 저장 과정에서 오류가 발생했습니다."),
     JSON_MAPPING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "JSON 매핑에 실패했습니다."),
+    CHAT_ROOM_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "채팅방을 불러오는 과정에서 오류가 발생했습니다."),
 
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "잘못된 입력값입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다.");

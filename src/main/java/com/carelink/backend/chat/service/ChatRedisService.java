@@ -51,7 +51,8 @@ public class ChatRedisService {
                     try {
                         return objectMapper.readValue(c, ConversationDto.class);
                     } catch (Exception e) {
-                        throw new BaseException(ErrorCode.JSON_MAPPING_ERROR);
+                        log.error("채팅방 조회 에러 - " + e.getMessage());
+                        throw new BaseException(ErrorCode.CHAT_ROOM_ERROR);
                     }
                 }).toList();
     }
