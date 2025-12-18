@@ -41,4 +41,11 @@ public class AuthController {
                 .body(BaseResponse.success(tokens));
     }
 
+    @PostMapping("/signup/duplicate-check")
+    public ResponseEntity<BaseResponse<?>> isPhoneNumDuplicate(@RequestBody String phoneNum) {
+        Boolean phoneNumDuplicate = authService.isPhoneNumDuplicate(phoneNum);
+        return ResponseEntity.ok()
+                .body(BaseResponse.success("아이디 중복 여부를 정상적으로 불러왔습니다.", phoneNumDuplicate));
+    }
+
 }
