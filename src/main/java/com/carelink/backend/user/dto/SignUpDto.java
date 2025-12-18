@@ -2,10 +2,7 @@ package com.carelink.backend.user.dto;
 
 import com.carelink.backend.user.Category;
 import com.carelink.backend.user.CognitiveState;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -18,6 +15,7 @@ public class SignUpDto {
     private String name;
 
     @NotBlank
+    @Size(min = 4, message = "비밀번호는 4자 이상이어야 합니다.")
     private String password;
 
     @NotBlank

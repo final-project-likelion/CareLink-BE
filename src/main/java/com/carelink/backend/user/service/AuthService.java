@@ -103,4 +103,11 @@ public class AuthService {
         return createAndSaveToken(userIdFromToken);
     }
 
+    /** 회원가입 시 id (전화번호) 중복 체크 */
+    public Boolean isPhoneNumDuplicate(String phoneNum) {
+        if (userRepository.existsByPhoneNum(phoneNum))
+            return true;
+        return false;
+    }
+
 }
