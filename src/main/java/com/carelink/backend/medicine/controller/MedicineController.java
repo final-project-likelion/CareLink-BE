@@ -35,4 +35,12 @@ public class MedicineController {
                 .body(BaseResponse.success("약 목록을 정상적으로 불러왔습니다.", medicineInfoByUserId));
     }
 
+    @DeleteMapping("/{medicineId}")
+    public ResponseEntity<BaseResponse<?>> deleteMedicine(@PathVariable Long medicineId,
+                                                          @AuthenticationPrincipal User user) {
+        medicineService.deleteMedicine(user.getId(), medicineId);
+        return ResponseEntity.ok()
+                .body(BaseResponse.success("약을 정상적으로 삭제했습니다.", null));
+    }
+
 }

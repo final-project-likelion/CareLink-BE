@@ -12,4 +12,5 @@ public interface MedicineIntakeTimeRepository extends JpaRepository<MedicineInta
     List<MedicineIntakeTime> findByUserMedicineId(Long userMedicineId);
     List<MedicineIntakeTime> findByUserMedicine_User_Id(Long userId);
     Optional<MedicineIntakeTime> findByUserMedicine_User_IdAndId(Long userId, Long medicineIntakeTimeId);
+    void deleteByIdIn(List<Long> ids);
 }

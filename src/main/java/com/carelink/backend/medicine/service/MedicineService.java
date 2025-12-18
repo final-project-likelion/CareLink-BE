@@ -1,9 +1,13 @@
 package com.carelink.backend.medicine.service;
 
+import com.carelink.backend.global.exception.BaseException;
+import com.carelink.backend.global.exception.ErrorCode;
 import com.carelink.backend.medicine.dto.MedicineInfoDto;
 import com.carelink.backend.medicine.dto.MedicineUpsertRequestDto;
+import com.carelink.backend.medicine.entity.MedicineIntakeLog;
 import com.carelink.backend.medicine.entity.MedicineIntakeTime;
 import com.carelink.backend.medicine.entity.UserMedicine;
+import com.carelink.backend.medicine.repository.MedicineIntakeLogRepository;
 import com.carelink.backend.medicine.repository.MedicineIntakeTimeRepository;
 import com.carelink.backend.medicine.repository.UserMedicineRepository;
 import com.carelink.backend.user.entity.User;
@@ -23,6 +27,7 @@ public class MedicineService {
 
     private final UserMedicineRepository userMedicineRepository;
     private final MedicineIntakeTimeRepository medicineIntakeTimeRepository;
+    private final MedicineIntakeLogRepository medicineIntakeLogRepository;
 
     /** 새로운 약 추가 */
     @Transactional
@@ -67,6 +72,32 @@ public class MedicineService {
         }
 
         return medicineInfoDtos;
+    }
+
+    /** 약 삭제 */
+    @Transactional
+    public void deleteMedicine(Long userId, Long medicineId) {
+        // 해당 id의 약 조회
+        UserMedicine userMedicine = userMedicineRepository.findByUserIdAndId(userId, medicineId)
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_MEDICINE_NOT_FOUND));
+
+        // 해당 약의 복용 시간 조회
+        List<Long> medicineIntakeTimeIds = medicineIntakeTimeRepository.findByUserMedicineId(userMedicine.getId()).stream()
+                .map(MedicineIntakeTime::getId)
+                .toList();
+
+        // 해당 약의 복용 기록 조회
+        if (!medicineIntakeTimeIds.isEmpty()) {
+            List<Long> medicineIntakeLogIds = medicineIntakeLogRepository.findByMedicineIntakeTimeIdIn(medicineIntakeTimeIds)
+                    .stream().map(MedicineIntakeLog::getId).toList();
+
+            if (!medicineIntakeLogIds.isEmpty())
+                medicineIntakeLogRepository.deleteByIdIn(medicineIntakeLogIds);
+
+            medicineIntakeTimeRepository.deleteByIdIn(medicineIntakeTimeIds);
+        }
+
+        userMedicineRepository.delete(userMedicine);
     }
 
 }
