@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
         if (fieldError != null) {
             String code = fieldError.getCode();
 
-            if ("Pattern".equals(code) || "Email".equals(code)) {
+            if ("Pattern".equals(code) || "Email".equals(code) || "Size".equals(code)) {
                 message = fieldError.getDefaultMessage();
             }
         }
