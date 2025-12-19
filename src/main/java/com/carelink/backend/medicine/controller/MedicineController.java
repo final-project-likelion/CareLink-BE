@@ -1,6 +1,7 @@
 package com.carelink.backend.medicine.controller;
 
 import com.carelink.backend.global.response.BaseResponse;
+import com.carelink.backend.medicine.dto.IntakeTimeAddRequestDto;
 import com.carelink.backend.medicine.dto.MedicineInfoDto;
 import com.carelink.backend.medicine.dto.MedicineUpdateRequestDto;
 import com.carelink.backend.medicine.dto.MedicineUpsertRequestDto;
@@ -51,6 +52,15 @@ public class MedicineController {
         medicineService.updateMedicineInfo(user.getId(), medicineId, updateRequestDto);
         return ResponseEntity.ok()
                 .body(BaseResponse.success("약 정보를 정상적으로 업데이트했습니다.", null));
+    }
+
+    @PostMapping("/{medicineId}")
+    public ResponseEntity<BaseResponse<?>> addIntakeTime(@PathVariable Long medicineId,
+                                                         @Valid @RequestBody IntakeTimeAddRequestDto intakeTimeAddRequestDto,
+                                                         @AuthenticationPrincipal User user) {
+        List<MedicineInfoDto.MedicineIntakeTimeDto> medicineIntakeTimeDtos = medicineService.addIntakeTime(user.getId(), medicineId, intakeTimeAddRequestDto);
+        return ResponseEntity.ok()
+                .body(BaseResponse.success("복용시간을 정상적으로 추가했습니다.", medicineIntakeTimeDtos));
     }
 
 }

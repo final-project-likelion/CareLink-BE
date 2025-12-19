@@ -2,6 +2,7 @@ package com.carelink.backend.medicine.service;
 
 import com.carelink.backend.global.exception.BaseException;
 import com.carelink.backend.global.exception.ErrorCode;
+import com.carelink.backend.medicine.dto.IntakeTimeAddRequestDto;
 import com.carelink.backend.medicine.dto.MedicineInfoDto;
 import com.carelink.backend.medicine.dto.MedicineUpdateRequestDto;
 import com.carelink.backend.medicine.dto.MedicineUpsertRequestDto;
@@ -110,7 +111,6 @@ public class MedicineService {
     /** 약 정보 수정 */
     @Transactional
     public void updateMedicineInfo(Long userId, Long medicineId, MedicineUpdateRequestDto updateRequestDto) {
-
         UserMedicine userMedicine = userMedicineRepository.findByUserIdAndId(userId, medicineId)
                 .orElseThrow(() -> new BaseException(ErrorCode.USER_MEDICINE_NOT_FOUND));
 
@@ -121,16 +121,37 @@ public class MedicineService {
         // 복용 시간 수정
         if (updateRequestDto.getModifiedIntakeTimes() != null) {
 
-            for (MedicineUpdateRequestDto.IntakeTimeUpdateRequestDto intakeTimeUpdateRequestDto : updateRequestDto.getModifiedIntakeTimes()) {
-                Long intakeTimeId = intakeTimeUpdateRequestDto.getIntakeTimeId();
+            for (MedicineUpdateRequestDto.IntakeTimeDto intakeTimeDto : updateRequestDto.getModifiedIntakeTimes()) {
+                Long intakeTimeId = intakeTimeDto.getIntakeTimeId();
 
                 MedicineIntakeTime intakeTime = medicineIntakeTimeRepository.findByUserMedicineIdAndId(userMedicine.getId(), intakeTimeId)
                         .orElseThrow(() -> new BaseException(ErrorCode.MEDICINE_INTAKE_TIME_NOT_FOUND));
 
-                intakeTime.updateTime(intakeTimeUpdateRequestDto.getTime());
+                intakeTime.updateTime(intakeTimeDto.getTime());
             }
         }
+    }
 
+    @Transactional
+    public List<MedicineInfoDto.MedicineIntakeTimeDto> addIntakeTime(Long userId, Long medicineId, IntakeTimeAddRequestDto intakeTimeAddRequestDto) {
+        UserMedicine userMedicine = userMedicineRepository.findByUserIdAndId(userId, medicineId)
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_MEDICINE_NOT_FOUND));
+
+        List<MedicineInfoDto.MedicineIntakeTimeDto> newIntakeTimes = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        for (LocalTime time : intakeTimeAddRequestDto.getTimes()) {
+            MedicineIntakeTime medicineIntakeTime = MedicineIntakeTime.builder()
+                    .time(time)
+                    .userMedicine(userMedicine).build();
+            medicineIntakeTimeRepository.save(medicineIntakeTime);
+
+            MedicineInfoDto.MedicineIntakeTimeDto newIntakeTime = MedicineInfoDto.MedicineIntakeTimeDto.builder()
+                    .id(medicineIntakeTime.getId())
+                    .time(time.format(formatter)).build();
+            newIntakeTimes.add(newIntakeTime);
+        }
+
+        return newIntakeTimes;
     }
 
 }
