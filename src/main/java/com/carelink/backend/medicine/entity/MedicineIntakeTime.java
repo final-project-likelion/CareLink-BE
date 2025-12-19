@@ -31,4 +31,10 @@ public class MedicineIntakeTime {
     @OneToMany(mappedBy = "medicineIntakeTime")
     private List<MedicineIntakeLog> medicineIntakeLogs = new ArrayList<>();
 
+    /** 복용시간 변경 */
+    public void updateTime(LocalTime time) {
+        if (time != null)
+            this.time = time;
+    }
+
 }
