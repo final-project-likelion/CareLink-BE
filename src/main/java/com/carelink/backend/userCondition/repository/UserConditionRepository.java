@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface UserConditionRepository extends JpaRepository<UserCondition, Long> {
     Optional<UserCondition> findByUserIdAndDate(Long userId, LocalDate date);
+    Boolean existsByUserIdAndDate(Long userId, LocalDate date);
 }
