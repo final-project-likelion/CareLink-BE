@@ -14,6 +14,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 @Builder
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {"date"})}
+)
 public class UserCondition {
 
     @Id
