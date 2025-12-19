@@ -6,6 +6,8 @@ import com.carelink.backend.chat.dto.ChatRoomDto;
 import com.carelink.backend.chat.dto.ConversationDto;
 import com.carelink.backend.global.exception.BaseException;
 import com.carelink.backend.global.exception.ErrorCode;
+import com.carelink.backend.medicine.repository.MedicineIntakeLogRepository;
+import com.carelink.backend.userCondition.repository.UserConditionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -24,6 +27,8 @@ import java.util.List;
 @Slf4j
 public class ChatService {
 
+    private final MedicineIntakeLogRepository medicineIntakeLogRepository;
+    private final UserConditionRepository userConditionRepository;
     @Value("${chat.api.url}")
     private String CHAT_API_URL;
 
@@ -71,13 +76,20 @@ public class ChatService {
 
     /** 채팅방 조회 */
     public ChatRoomDto getChatRoom(Long userId) {
-        // TODO: 약 복용, 퀴즈, 컨디션 체크 여부 반환
+        // 약 복용 체크 여부
+        Boolean isMedicineChecked = medicineIntakeLogRepository.existsByMedicineIntakeTime_UserMedicine_User_IdAndDate(userId, LocalDate.now());
 
+        // 컨디션 체크 여부
+        Boolean isConditionChecked = userConditionRepository.existsByUserIdAndDate(userId, LocalDate.now());
+
+        // TODO: 퀴즈 여부
+
+        // 채팅 내용
         List<ConversationDto> allConversationsByUserId = chatRedisService.getAllQnasByUserId(userId);
 
         return ChatRoomDto.builder()
-                .isMedicineChecked(true)
-                .isConditionChecked(true)
+                .isMedicineChecked(isMedicineChecked)
+                .isConditionChecked(isConditionChecked)
                 .isQuizChecked(true)
                 .conversations(allConversationsByUserId).build();
     }
