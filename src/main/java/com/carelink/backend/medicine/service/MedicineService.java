@@ -58,16 +58,22 @@ public class MedicineService {
         // UserMedicine별 MedicineIntakeTime 조회
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         for (UserMedicine userMedicine : userMedicines) {
+            // 약 복용 시간 조회
             List<MedicineIntakeTime> medicineIntakeTimes = medicineIntakeTimeRepository.findByUserMedicineId(userMedicine.getId());
 
-            List<String> times = medicineIntakeTimes.stream()
-                    .map(x -> x.getTime().format(formatter))
-                    .collect(Collectors.toList());
+            // MedicineIntakeTimeDto (id + time) 생성
+            List<MedicineInfoDto.MedicineIntakeTimeDto> medicineIntakeTimeDtos = new ArrayList<>();
+            for (MedicineIntakeTime medicineIntakeTime : medicineIntakeTimes) {
+                MedicineInfoDto.MedicineIntakeTimeDto time = MedicineInfoDto.MedicineIntakeTimeDto.builder()
+                        .id(medicineIntakeTime.getId())
+                        .time(medicineIntakeTime.getTime().format(formatter)).build();
+                medicineIntakeTimeDtos.add(time);
+            }
 
             MedicineInfoDto dto = MedicineInfoDto.builder()
                     .id(userMedicine.getId())
                     .name(userMedicine.getName())
-                    .times(times).build();
+                    .times(medicineIntakeTimeDtos).build();
             medicineInfoDtos.add(dto);
         }
 

@@ -13,6 +13,14 @@ public class MedicineInfoDto {
 
     private String name;
 
-    private List<String> times;
+    private List<MedicineIntakeTimeDto> times;
+
+    @Data
+    @Builder
+    public static class MedicineIntakeTimeDto {
+        private Long id;
+
+        private String time;
+    }
 
 }
