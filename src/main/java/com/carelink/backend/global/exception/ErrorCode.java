@@ -32,6 +32,9 @@ public enum ErrorCode {
     USER_MEDICINE_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 id의 약이 존재하지 않습니다."),
     MEDICINE_INTAKE_TIME_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 id의 복용 시간이 존재하지 않습니다."),
 
+    // 컨디션 관련
+    USER_CONDITION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "해당 날짜의 컨디션 정보가 이미 존재합니다."),
+
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "잘못된 입력값입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다.");
 
