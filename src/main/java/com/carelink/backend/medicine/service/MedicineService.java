@@ -3,6 +3,7 @@ package com.carelink.backend.medicine.service;
 import com.carelink.backend.global.exception.BaseException;
 import com.carelink.backend.global.exception.ErrorCode;
 import com.carelink.backend.medicine.dto.MedicineInfoDto;
+import com.carelink.backend.medicine.dto.MedicineUpdateRequestDto;
 import com.carelink.backend.medicine.dto.MedicineUpsertRequestDto;
 import com.carelink.backend.medicine.entity.MedicineIntakeLog;
 import com.carelink.backend.medicine.entity.MedicineIntakeTime;
@@ -19,7 +20,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -104,6 +104,33 @@ public class MedicineService {
         }
 
         userMedicineRepository.delete(userMedicine);
+    }
+
+
+    /** 약 정보 수정 */
+    @Transactional
+    public void updateMedicineInfo(Long userId, Long medicineId, MedicineUpdateRequestDto updateRequestDto) {
+
+        UserMedicine userMedicine = userMedicineRepository.findByUserIdAndId(userId, medicineId)
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_MEDICINE_NOT_FOUND));
+
+        // 이름 수정
+        if (updateRequestDto.getName() != null)
+            userMedicine.updateName(updateRequestDto.getName());
+
+        // 복용 시간 수정
+        if (updateRequestDto.getModifiedIntakeTimes() != null) {
+
+            for (MedicineUpdateRequestDto.IntakeTimeUpdateRequestDto intakeTimeUpdateRequestDto : updateRequestDto.getModifiedIntakeTimes()) {
+                Long intakeTimeId = intakeTimeUpdateRequestDto.getIntakeTimeId();
+
+                MedicineIntakeTime intakeTime = medicineIntakeTimeRepository.findByUserMedicineIdAndId(userMedicine.getId(), intakeTimeId)
+                        .orElseThrow(() -> new BaseException(ErrorCode.MEDICINE_INTAKE_TIME_NOT_FOUND));
+
+                intakeTime.updateTime(intakeTimeUpdateRequestDto.getTime());
+            }
+        }
+
     }
 
 }
