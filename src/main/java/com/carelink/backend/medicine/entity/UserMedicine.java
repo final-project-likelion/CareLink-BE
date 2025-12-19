@@ -31,4 +31,10 @@ public class UserMedicine {
     @OneToMany(mappedBy = "userMedicine")
     private List<MedicineIntakeTime> medicineIntakeTimes = new ArrayList<>();
 
+    /** 약 이름 변경 */
+    public void updateName(String name) {
+        if (name != null && !name.isBlank())
+            this.name = name;
+    }
+
 }

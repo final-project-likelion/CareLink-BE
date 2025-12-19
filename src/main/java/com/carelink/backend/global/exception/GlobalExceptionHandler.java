@@ -75,4 +75,10 @@ public class GlobalExceptionHandler {
                 .body(BaseResponse.error(ErrorCode.INVALID_INPUT_VALUE, "요청 바디가 비어있거나 JSON 형식이 올바르지 않거나 매핑에 실패했습니다."));
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<BaseResponse<?>> handleException(Exception e) {
+        return ResponseEntity.internalServerError()
+                .body(BaseResponse.error(ErrorCode.INTERNAL_SERVER_ERROR, "서버에서 예상치 못한 오류가 발생했습니다. - " + e.getMessage()));
+    }
+
 }
