@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-
 @Entity
 @Getter
 @NoArgsConstructor
@@ -26,11 +25,9 @@ public class News {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    // 리스트용 한줄요약 (첫번째 페이지)
     @Column(length = 255)
     private String previewSummary;
 
-    // 썸네일 이미지 URL
     private String thumbnailUrl;
 
     private LocalDate createdDate;
@@ -42,7 +39,12 @@ public class News {
         this.createdDate = LocalDate.now();
     }
 
-    // 나중에 채우기용 setter
+    // 한줄요약만 채우는 메서드
+    public void updatePreview(String previewSummary) {
+        this.previewSummary = previewSummary;
+    }
+
+    // 기존 메서드
     public void updatePreview(String previewSummary, String thumbnailUrl) {
         this.previewSummary = previewSummary;
         this.thumbnailUrl = thumbnailUrl;
