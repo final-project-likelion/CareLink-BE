@@ -1,9 +1,13 @@
 package com.carelink.backend.training.news.service;
 
+import com.carelink.backend.training.news.ai.AiSixWClient;
+import com.carelink.backend.training.news.ai.AiSummaryClient;
+import com.carelink.backend.training.news.ai.dto.SixWResponseDto;
 import com.carelink.backend.training.news.crawler.NaverNewsCrawler;
 import com.carelink.backend.training.news.entity.News;
+import com.carelink.backend.training.news.entity.SixWAnswer;
 import com.carelink.backend.training.news.repository.NewsRepository;
-import com.carelink.backend.training.news.ai.AiSummaryClient;
+import com.carelink.backend.training.news.repository.SixWAnswerRepository;
 import com.carelink.backend.user.Category;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,16 +20,22 @@ public class DailyNewsCrawlingService {
 
     private final NaverNewsCrawler crawler;
     private final NewsRepository newsRepository;
+    private final SixWAnswerRepository sixWAnswerRepository;
     private final AiSummaryClient aiSummaryClient;
+    private final AiSixWClient aiSixWClient;
 
     public DailyNewsCrawlingService(
             NaverNewsCrawler crawler,
             NewsRepository newsRepository,
-            AiSummaryClient aiSummaryClient
+            SixWAnswerRepository sixWAnswerRepository,
+            AiSummaryClient aiSummaryClient,
+            AiSixWClient aiSixWClient
     ) {
         this.crawler = crawler;
         this.newsRepository = newsRepository;
+        this.sixWAnswerRepository = sixWAnswerRepository;
         this.aiSummaryClient = aiSummaryClient;
+        this.aiSixWClient = aiSixWClient;
     }
 
     @Transactional
@@ -40,9 +50,7 @@ public class DailyNewsCrawlingService {
                     usedUrls
             );
 
-            if (crawled == null) {
-                continue;
-            }
+            if (crawled == null) continue;
 
             News news = new News(
                     crawled.title(),
@@ -50,19 +58,31 @@ public class DailyNewsCrawlingService {
                     category
             );
 
-            // AI 한줄요약 생성
+            // 1. AI 한줄 요약
             String previewSummary =
                     aiSummaryClient.generatePreviewSummary(news.getContent());
-
-            // 엔티티에 요약 채우기
             news.updatePreview(previewSummary);
 
-            // 기존 로직
             newsRepository.save(news);
+
+            // 2. 육하원칙 정답 생성
+            SixWResponseDto sixw =
+                    aiSixWClient.generateSixW(news.getTitle(), news.getContent());
+
+            SixWAnswer answer = new SixWAnswer(
+                    news,
+                    sixw.getWho(),
+                    sixw.getWhen(),
+                    sixw.getWhere(),
+                    sixw.getWhat(),
+                    sixw.getWhy(),
+                    sixw.getHow()
+            );
+
+            sixWAnswerRepository.save(answer);
         }
     }
 
-    // 우리 카테고리와 네이버 뉴스의 카테고리를 임의로 매핑하기
     private String mapToNaverCode(Category category) {
         return switch (category) {
             case HEALTH -> "103";
