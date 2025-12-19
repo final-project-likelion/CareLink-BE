@@ -16,4 +16,5 @@ public interface MedicineIntakeLogRepository extends JpaRepository<MedicineIntak
     void deleteByMedicineIntakeTimeIdInAndDate(Set<Long> medicineIntakeTimeId, LocalDate date);
     void deleteByIdIn(List<Long> ids);
     List<MedicineIntakeLog> findByMedicineIntakeTimeIdIn(List<Long> medicineIntakeTimeId);
+    Boolean existsByMedicineIntakeTime_UserMedicine_User_IdAndDate(Long userId, LocalDate date);
 }
