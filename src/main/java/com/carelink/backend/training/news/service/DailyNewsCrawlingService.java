@@ -11,6 +11,11 @@ import com.carelink.backend.training.news.repository.SixWAnswerRepository;
 import com.carelink.backend.user.Category;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.carelink.backend.training.news.ai.AiArticleSummaryClient;
+import com.carelink.backend.training.news.ai.dto.ArticleSummaryResponseDto;
+import com.carelink.backend.training.news.entity.ArticleSummaryAnswer;
+import com.carelink.backend.training.news.repository.ArticleSummaryAnswerRepository;
+
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,20 +28,28 @@ public class DailyNewsCrawlingService {
     private final SixWAnswerRepository sixWAnswerRepository;
     private final AiSummaryClient aiSummaryClient;
     private final AiSixWClient aiSixWClient;
+    private final ArticleSummaryAnswerRepository articleSummaryAnswerRepository;
+    private final AiArticleSummaryClient aiArticleSummaryClient;
+
 
     public DailyNewsCrawlingService(
             NaverNewsCrawler crawler,
             NewsRepository newsRepository,
             SixWAnswerRepository sixWAnswerRepository,
+            ArticleSummaryAnswerRepository articleSummaryAnswerRepository,
             AiSummaryClient aiSummaryClient,
-            AiSixWClient aiSixWClient
+            AiSixWClient aiSixWClient,
+            AiArticleSummaryClient aiArticleSummaryClient
     ) {
         this.crawler = crawler;
         this.newsRepository = newsRepository;
         this.sixWAnswerRepository = sixWAnswerRepository;
+        this.articleSummaryAnswerRepository = articleSummaryAnswerRepository;
         this.aiSummaryClient = aiSummaryClient;
         this.aiSixWClient = aiSixWClient;
+        this.aiArticleSummaryClient = aiArticleSummaryClient;
     }
+
 
     @Transactional
     public void crawlDailyNews() {
@@ -80,6 +93,21 @@ public class DailyNewsCrawlingService {
             );
 
             sixWAnswerRepository.save(answer);
+
+            // 3. 기사요약 정답 생성
+            ArticleSummaryResponseDto articleSummary =
+                    aiArticleSummaryClient.generateArticleSummary(
+                            news.getTitle(),
+                            news.getContent()
+                    );
+
+            ArticleSummaryAnswer summaryAnswer =
+                    new ArticleSummaryAnswer(
+                            news,
+                            articleSummary.getSummary()
+                    );
+
+            articleSummaryAnswerRepository.save(summaryAnswer);
         }
     }
 
