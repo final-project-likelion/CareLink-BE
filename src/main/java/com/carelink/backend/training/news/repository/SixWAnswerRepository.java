@@ -1,4 +1,7 @@
 package com.carelink.backend.training.news.repository;
 
-public interface SixWAnswerRepository {
+import com.carelink.backend.training.news.entity.SixWAnswer;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SixWAnswerRepository extends JpaRepository<SixWAnswer, Long> {
 }
