@@ -26,13 +26,13 @@ public class UserCondition {
     private Long id;
 
     @Column(nullable = false)
-    private int moodScore;
+    private Integer moodScore;
 
     @Column(nullable = false)
-    private int sleepScore;
+    private Integer sleepScore;
 
     @Column(nullable = false)
-    private int painScore;
+    private Integer painScore;
 
     @Column(nullable = false)
     private LocalDate date;
@@ -40,5 +40,12 @@ public class UserCondition {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    /** 점수 업데이트 */
+    public void updateScores(Integer moodScore, Integer sleepScore, Integer painScore) {
+        this.moodScore = moodScore;
+        this.sleepScore = sleepScore;
+        this.painScore = painScore;
+    }
 
 }

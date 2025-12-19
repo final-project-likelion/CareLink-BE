@@ -54,4 +54,19 @@ public class UserConditionService {
                 .build();
     }
 
+    @Transactional
+    public UserConditionResponseDto updateUserCondition(Long userId, UserConditionRequestDto userConditionRequestDto) {
+        UserCondition userCondition = userConditionRepository.findByUserIdAndDate(userId, LocalDate.now())
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_CONDITION_NOT_FOUND));
+
+        userCondition.updateScores(userConditionRequestDto.getMoodScore(), userConditionRequestDto.getSleepScore(), userConditionRequestDto.getPainScore());
+
+        return UserConditionResponseDto.builder()
+                .date(LocalDate.now())
+                .moodScore(userCondition.getMoodScore())
+                .sleepScore(userCondition.getSleepScore())
+                .painScore(userCondition.getPainScore())
+                .build();
+    }
+
 }

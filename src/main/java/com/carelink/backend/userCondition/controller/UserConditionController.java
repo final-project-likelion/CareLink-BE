@@ -30,7 +30,15 @@ public class UserConditionController {
                                                                 @Valid @RequestBody UserConditionRequestDto userConditionRequestDto) {
         UserConditionResponseDto userCondition = userConditionService.createUserCondition(user, userConditionRequestDto);
         return ResponseEntity.ok()
-                .body(BaseResponse.success("사용자의 오늘 컨디션 정보를 정상적으로 업데이트했습니다.", userCondition));
+                .body(BaseResponse.success("사용자의 오늘 컨디션 정보를 정상적으로 추가했습니다.", userCondition));
+    }
+
+    @PutMapping
+    private ResponseEntity<BaseResponse<?>> updateUserCondition(@AuthenticationPrincipal User user,
+                                                                @Valid @RequestBody UserConditionRequestDto userConditionRequestDto) {
+        UserConditionResponseDto userCondition = userConditionService.updateUserCondition(user.getId(), userConditionRequestDto);
+        return ResponseEntity.ok()
+                .body(BaseResponse.success("사용자의 오늘 컨디션 정보를 정상적으로 수정했습니다.", userCondition));
     }
 
 }
