@@ -10,10 +10,10 @@ public class MedicineUpdateRequestDto {
 
     private String name;
 
-    private List<IntakeTimeUpdateRequestDto> modifiedIntakeTimes;
+    private List<IntakeTimeDto> modifiedIntakeTimes;
 
     @Data
-    public static class IntakeTimeUpdateRequestDto {
+    public static class IntakeTimeDto {
         private Long intakeTimeId;
 
         private LocalTime time;
