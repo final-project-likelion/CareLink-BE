@@ -1,4 +1,10 @@
 package com.carelink.backend.training.news.dto;
 
-public class UserSixWSubmitRequest {
-}
+public record UserSixWSubmitRequest(
+        String who,
+        String whenAt,
+        String whereAt,
+        String what,
+        String why,
+        String how
+) {}
