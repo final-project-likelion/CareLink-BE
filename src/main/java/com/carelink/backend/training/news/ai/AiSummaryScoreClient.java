@@ -1,11 +1,11 @@
 package com.carelink.backend.training.news.ai;
 
-import com.carelink.backend.training.news.ai.dto.SummaryScoreRequest;
-import com.carelink.backend.training.news.ai.dto.SummaryScoreResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
 
 @Component
 public class AiSummaryScoreClient {
@@ -13,7 +13,7 @@ public class AiSummaryScoreClient {
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${AI_SUMMARY_SCORE_URL}")
-    private String aiSummaryScoreUrl;
+    private String aiScoreUrl;
 
     public Integer scoreSummary(
             String article,
@@ -23,22 +23,31 @@ public class AiSummaryScoreClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        SummaryScoreRequest body = new SummaryScoreRequest(
-                article,
-                correctSummary,
-                userSummary
+        Map<String, String> body = Map.of(
+                "article", article,
+                "correct_summary", correctSummary,
+                "user_summary", userSummary
         );
 
-        HttpEntity<SummaryScoreRequest> request =
+        HttpEntity<Map<String, String>> request =
                 new HttpEntity<>(body, headers);
 
-        ResponseEntity<SummaryScoreResponse> response =
-                restTemplate.postForEntity(
-                        aiSummaryScoreUrl,
-                        request,
-                        SummaryScoreResponse.class
-                );
+        ResponseEntity<Map> response =
+                restTemplate.postForEntity(aiScoreUrl, request, Map.class);
 
-        return response.getBody().score();
+        // 필수 방어 코드
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new IllegalStateException(
+                    "AI server error: " + response.getStatusCode()
+            );
+        }
+
+        Map responseBody = response.getBody();
+        if (responseBody == null) {
+            throw new IllegalStateException("AI response body is null");
+        }
+
+        Object score = responseBody.get("score");
+        return ((Number) score).intValue();
     }
 }
