@@ -18,7 +18,7 @@ public class SixWController {
     public SixWResultResponse submitSixW(
             @PathVariable Long newsId,
             @RequestBody UserSixWSubmitRequest request,
-            @AuthenticationPrincipal User user   // ⭐ 이게 핵심
+            @AuthenticationPrincipal User user
     ) {
         return sixWService.submitSixWAnswer(user, newsId, request);
     }

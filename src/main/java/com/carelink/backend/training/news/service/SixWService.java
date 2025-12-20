@@ -31,7 +31,7 @@ public class SixWService {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new IllegalArgumentException("뉴스 없음"));
 
-        // ✅ (체크) 수정: 사용자 육하원칙 답변 저장 로직은 유지
+        // 사용자 육하원칙 답변 저장 로직은 유지
         UserSixWAnswer userAnswer = new UserSixWAnswer(
                 user,
                 news,
@@ -44,11 +44,11 @@ public class SixWService {
         );
         userSixWAnswerRepository.save(userAnswer);
 
-        // ✅ (체크) 수정: 정답만 조회
+        // 정답만 조회
         SixWAnswer correct = sixWAnswerRepository.findByNews(news)
                 .orElseThrow(() -> new IllegalStateException("정답 없음"));
 
-        // ✅ (체크) 수정: CorrectSixWAnswer DTO로 변환
+        // CorrectSixWAnswer DTO로 변환
         CorrectSixWAnswer correctAnswer = new CorrectSixWAnswer(
                 correct.getWho(),
                 correct.getWhenAt(),
@@ -58,7 +58,7 @@ public class SixWService {
                 correct.getHow()
         );
 
-        // ✅ (체크) 수정: newsId 포함 + userAnswer 제거
+        // newsId 포함 + userAnswer 제거
         return new SixWResultResponse(
                 news.getId(),
                 correctAnswer,
