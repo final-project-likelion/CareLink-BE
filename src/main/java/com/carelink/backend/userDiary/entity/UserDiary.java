@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Table(
         uniqueConstraints = {
                 @UniqueConstraint(
-                        columnNames = {"date"})}
+                        columnNames = {"date", "user_id"})}
 )
 public class UserDiary {
 
