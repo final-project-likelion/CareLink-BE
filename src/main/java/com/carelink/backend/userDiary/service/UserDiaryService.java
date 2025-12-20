@@ -5,6 +5,7 @@ import com.carelink.backend.global.exception.ErrorCode;
 import com.carelink.backend.global.service.FileService;
 import com.carelink.backend.user.entity.User;
 import com.carelink.backend.userDiary.dto.DiaryCreateRequestDto;
+import com.carelink.backend.userDiary.dto.MonthlyDiaryDto;
 import com.carelink.backend.userDiary.entity.UserDiary;
 import com.carelink.backend.userDiary.repository.UserDiaryRepository;
 import jakarta.transaction.Transactional;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +39,21 @@ public class UserDiaryService {
         userDiaryRepository.save(userDiary);
 
         return userDiary.getId();
+    }
+
+    public List<MonthlyDiaryDto> getMonthlyUserDiary(Long userId, String year, String month) {
+        LocalDate start = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), 1);
+        LocalDate end = start.plusMonths(1);
+
+        List<MonthlyDiaryDto> diaryDtos = new ArrayList<>();
+        userDiaryRepository.findByDateBetweenAndUserId(userId, start, end).forEach(userDiary -> {
+            MonthlyDiaryDto dto = MonthlyDiaryDto.builder().id(userDiary.getId())
+                    .title(userDiary.getTitle())
+                    .date(userDiary.getDate()).build();
+            diaryDtos.add(dto);
+        });
+
+        return diaryDtos;
     }
 
 }
