@@ -1,4 +1,4 @@
-package com.carelink.backend.userCondition.entity;
+package com.carelink.backend.userDiary.entity;
 
 import com.carelink.backend.user.entity.User;
 import jakarta.persistence.*;
@@ -19,33 +19,23 @@ import java.time.LocalDate;
                 @UniqueConstraint(
                         columnNames = {"date", "user_id"})}
 )
-public class UserCondition {
+public class UserDiary {
 
     @Id
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private Integer moodScore;
-
-    @Column(nullable = false)
-    private Integer sleepScore;
-
-    @Column(nullable = false)
-    private Integer painScore;
+    private String title;
 
     @Column(nullable = false)
     private LocalDate date;
 
+    @Column(nullable = false)
+    private String imageUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
-    /** 점수 업데이트 */
-    public void updateScores(Integer moodScore, Integer sleepScore, Integer painScore) {
-        this.moodScore = moodScore;
-        this.sleepScore = sleepScore;
-        this.painScore = painScore;
-    }
 
 }
