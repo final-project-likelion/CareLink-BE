@@ -66,7 +66,7 @@ public class MedicineService {
             List<MedicineInfoDto.MedicineIntakeTimeDto> medicineIntakeTimeDtos = new ArrayList<>();
             for (MedicineIntakeTime medicineIntakeTime : medicineIntakeTimes) {
                 MedicineInfoDto.MedicineIntakeTimeDto time = MedicineInfoDto.MedicineIntakeTimeDto.builder()
-                        .id(medicineIntakeTime.getId())
+                        .timeId(medicineIntakeTime.getId())
                         .time(medicineIntakeTime.getTime().format(formatter)).build();
                 medicineIntakeTimeDtos.add(time);
             }
@@ -107,51 +107,51 @@ public class MedicineService {
         userMedicineRepository.delete(userMedicine);
     }
 
-
-    /** 약 정보 수정 */
+    /** 약 정보 수정 + 시간 추가 */
     @Transactional
-    public void updateMedicineInfo(Long userId, Long medicineId, MedicineUpdateRequestDto updateRequestDto) {
+    public MedicineInfoDto updateMedicineInfo(Long userId, Long medicineId, MedicineUpdateRequestDto updateRequestDto) {
         UserMedicine userMedicine = userMedicineRepository.findByUserIdAndId(userId, medicineId)
                 .orElseThrow(() -> new BaseException(ErrorCode.USER_MEDICINE_NOT_FOUND));
 
-        // 이름 수정
+        // 1. 이름 수정
         if (updateRequestDto.getName() != null)
             userMedicine.updateName(updateRequestDto.getName());
 
-        // 복용 시간 수정
-        if (updateRequestDto.getModifiedIntakeTimes() != null) {
+        // 2. 복용 시간 수정 + 추가
+        List<MedicineInfoDto.MedicineIntakeTimeDto> updatedIntakeTimes = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
-            for (MedicineUpdateRequestDto.IntakeTimeDto intakeTimeDto : updateRequestDto.getModifiedIntakeTimes()) {
-                Long intakeTimeId = intakeTimeDto.getIntakeTimeId();
+        if (updateRequestDto.getNewIntakeTimes() != null) {
+            for (MedicineUpdateRequestDto.IntakeTimeDto intakeTimeDto : updateRequestDto.getNewIntakeTimes()) {
+                Long timeId = intakeTimeDto.getTimeId();
 
-                MedicineIntakeTime intakeTime = medicineIntakeTimeRepository.findByUserMedicineIdAndId(userMedicine.getId(), intakeTimeId)
-                        .orElseThrow(() -> new BaseException(ErrorCode.MEDICINE_INTAKE_TIME_NOT_FOUND));
+                MedicineIntakeTime intakeTime;
 
-                intakeTime.updateTime(intakeTimeDto.getTime());
+                if (timeId == null) {
+                    // 2-1. 복용 시간 추가
+                    intakeTime = MedicineIntakeTime.builder()
+                            .time(intakeTimeDto.getTime())
+                            .userMedicine(userMedicine).build();
+                    medicineIntakeTimeRepository.save(intakeTime);
+                } else {
+                    // 2-2. 복용 시간 수정
+                    intakeTime = medicineIntakeTimeRepository.findByUserMedicineIdAndId(userMedicine.getId(), timeId)
+                            .orElseThrow(() -> new BaseException(ErrorCode.MEDICINE_INTAKE_TIME_NOT_FOUND));
+
+                    intakeTime.updateTime(intakeTimeDto.getTime());
+                }
+
+                MedicineInfoDto.MedicineIntakeTimeDto newIntakeTime = MedicineInfoDto.MedicineIntakeTimeDto.builder()
+                        .timeId(intakeTime.getId())
+                        .time(intakeTime.getTime().format(formatter)).build();
+                updatedIntakeTimes.add(newIntakeTime);
             }
         }
-    }
 
-    @Transactional
-    public List<MedicineInfoDto.MedicineIntakeTimeDto> addIntakeTime(Long userId, Long medicineId, IntakeTimeAddRequestDto intakeTimeAddRequestDto) {
-        UserMedicine userMedicine = userMedicineRepository.findByUserIdAndId(userId, medicineId)
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_MEDICINE_NOT_FOUND));
-
-        List<MedicineInfoDto.MedicineIntakeTimeDto> newIntakeTimes = new ArrayList<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        for (LocalTime time : intakeTimeAddRequestDto.getTimes()) {
-            MedicineIntakeTime medicineIntakeTime = MedicineIntakeTime.builder()
-                    .time(time)
-                    .userMedicine(userMedicine).build();
-            medicineIntakeTimeRepository.save(medicineIntakeTime);
-
-            MedicineInfoDto.MedicineIntakeTimeDto newIntakeTime = MedicineInfoDto.MedicineIntakeTimeDto.builder()
-                    .id(medicineIntakeTime.getId())
-                    .time(time.format(formatter)).build();
-            newIntakeTimes.add(newIntakeTime);
-        }
-
-        return newIntakeTimes;
+        return MedicineInfoDto.builder()
+                .id(userMedicine.getId())
+                .name(updateRequestDto.getName())
+                .times(updatedIntakeTimes).build();
     }
 
 }

@@ -45,22 +45,13 @@ public class MedicineController {
                 .body(BaseResponse.success("약을 정상적으로 삭제했습니다.", null));
     }
 
-    @PatchMapping("/{medicineId}")
-    public ResponseEntity<BaseResponse<?>> modifyMedicineInfo(@PathVariable Long medicineId,
-                                                          @RequestBody MedicineUpdateRequestDto updateRequestDto,
-                                                          @AuthenticationPrincipal User user) {
-        medicineService.updateMedicineInfo(user.getId(), medicineId, updateRequestDto);
+    @PutMapping("/{medicineId}")
+    public ResponseEntity<BaseResponse<?>> updateMedicineInfo(@PathVariable Long medicineId,
+                                                              @RequestBody MedicineUpdateRequestDto updateRequestDto,
+                                                              @AuthenticationPrincipal User user) {
+        MedicineInfoDto updatedMedicineInfo = medicineService.updateMedicineInfo(user.getId(), medicineId, updateRequestDto);
         return ResponseEntity.ok()
-                .body(BaseResponse.success("약 정보를 정상적으로 업데이트했습니다.", null));
-    }
-
-    @PostMapping("/{medicineId}")
-    public ResponseEntity<BaseResponse<?>> addIntakeTime(@PathVariable Long medicineId,
-                                                         @Valid @RequestBody IntakeTimeAddRequestDto intakeTimeAddRequestDto,
-                                                         @AuthenticationPrincipal User user) {
-        List<MedicineInfoDto.MedicineIntakeTimeDto> medicineIntakeTimeDtos = medicineService.addIntakeTime(user.getId(), medicineId, intakeTimeAddRequestDto);
-        return ResponseEntity.ok()
-                .body(BaseResponse.success("복용시간을 정상적으로 추가했습니다.", medicineIntakeTimeDtos));
+                .body(BaseResponse.success("약 정보를 정상적으로 수정했습니다.", updatedMedicineInfo));
     }
 
 }

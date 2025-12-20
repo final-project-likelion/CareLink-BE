@@ -18,7 +18,7 @@ public class MedicineInfoDto {
     @Data
     @Builder
     public static class MedicineIntakeTimeDto {
-        private Long id;
+        private Long timeId;
 
         private String time;
     }
