@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface UserDiaryRepository extends JpaRepository<UserDiary, Long> {
     Boolean existsByUserIdAndDate(Long userId, LocalDate date);
@@ -18,4 +19,6 @@ public interface UserDiaryRepository extends JpaRepository<UserDiary, Long> {
         ORDER BY ud.date ASC
     """)
     List<UserDiary> findByDateBetweenAndUserId(@Param("userId") Long userId, @Param("start") LocalDate start, @Param("end") LocalDate end);
+
+    Optional<UserDiary> findByUserIdAndId(Long userId, Long id);
 }

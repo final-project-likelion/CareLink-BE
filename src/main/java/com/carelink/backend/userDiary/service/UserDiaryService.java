@@ -6,6 +6,7 @@ import com.carelink.backend.global.service.FileService;
 import com.carelink.backend.user.entity.User;
 import com.carelink.backend.userDiary.dto.DiaryCreateRequestDto;
 import com.carelink.backend.userDiary.dto.MonthlyDiaryDto;
+import com.carelink.backend.userDiary.dto.UserDiaryDto;
 import com.carelink.backend.userDiary.entity.UserDiary;
 import com.carelink.backend.userDiary.repository.UserDiaryRepository;
 import jakarta.transaction.Transactional;
@@ -54,6 +55,17 @@ public class UserDiaryService {
         });
 
         return diaryDtos;
+    }
+
+    public UserDiaryDto getUserDiary(Long userId, Long diaryId) {
+        UserDiary userDiary = userDiaryRepository.findByUserIdAndId(userId, diaryId)
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_DIARY_NOT_FOUND));
+
+        return UserDiaryDto.builder()
+                .id(userDiary.getId())
+                .title(userDiary.getTitle())
+                .localDate(LocalDate.now())
+                .imageUrl(userDiary.getImageUrl()).build();
     }
 
 }

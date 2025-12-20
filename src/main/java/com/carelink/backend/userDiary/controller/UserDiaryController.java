@@ -4,6 +4,7 @@ import com.carelink.backend.global.response.BaseResponse;
 import com.carelink.backend.user.entity.User;
 import com.carelink.backend.userDiary.dto.DiaryCreateRequestDto;
 import com.carelink.backend.userDiary.dto.MonthlyDiaryDto;
+import com.carelink.backend.userDiary.dto.UserDiaryDto;
 import com.carelink.backend.userDiary.service.UserDiaryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,14 @@ public class UserDiaryController {
         List<MonthlyDiaryDto> monthlyUserDiary = userDiaryService.getMonthlyUserDiary(user.getId(), year, month);
         return ResponseEntity.ok()
                 .body(BaseResponse.success(String.format("%s년 %s월의 일기를 정상적으로 불러왔습니다.", year, month), monthlyUserDiary));
+    }
+
+    @GetMapping("/{diaryId}")
+    public ResponseEntity<BaseResponse<?>> getUserDiary(@AuthenticationPrincipal User user,
+                                                               @PathVariable Long diaryId) {
+        UserDiaryDto userDiary = userDiaryService.getUserDiary(user.getId(), diaryId);
+        return ResponseEntity.ok()
+                .body(BaseResponse.success("일기를 정상적으로 불러왔습니다.", userDiary));
     }
 
 }
