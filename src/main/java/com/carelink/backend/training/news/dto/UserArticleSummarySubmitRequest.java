@@ -1,4 +1,5 @@
 package com.carelink.backend.training.news.dto;
 
-public class UserArticleSummarySubmitRequest {
-}
+public record UserArticleSummarySubmitRequest(
+        String summary
+) {}

@@ -1,4 +1,6 @@
 package com.carelink.backend.training.news.dto;
 
-public class ArticleSummaryContent {
-}
+public record ArticleSummaryContent(
+        Long newsId,
+        String summary
+) {}

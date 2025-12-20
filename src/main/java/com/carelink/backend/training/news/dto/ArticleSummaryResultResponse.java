@@ -1,4 +1,6 @@
 package com.carelink.backend.training.news.dto;
 
-public class ArticleSummaryResultResponse {
-}
+public record ArticleSummaryResultResponse(
+        ArticleSummaryContent correctAnswer,
+        Integer score
+) {}
