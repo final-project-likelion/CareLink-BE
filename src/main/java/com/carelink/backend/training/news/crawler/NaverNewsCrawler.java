@@ -22,7 +22,7 @@ public class NaverNewsCrawler {
                     .timeout(5000)
                     .get();
 
-            // 첫 번째가 아니라 여러 개 후보를 가져옴 -> 중복 없는 크롤링을 구현하기 위함!
+            // 여러 개 후보 기사 가져오기
             Elements articleLinks = listDoc.select("ul.type06_headline li a");
 
             for (Element link : articleLinks) {
@@ -43,13 +43,21 @@ public class NaverNewsCrawler {
                 Element titleEl = articleDoc.selectFirst("#title_area span");
                 Element contentEl = articleDoc.selectFirst("#dic_area");
 
+                // 썸네일(meta og:image) 추출
+                Element thumbnailMeta =
+                        articleDoc.selectFirst("meta[property=og:image]");
+                String thumbnailImageUrl =
+                        thumbnailMeta != null ? thumbnailMeta.attr("content") : null;
+
                 if (titleEl == null || contentEl == null) {
-                    continue; // 이 기사 스킵하고 다음 후보 크롤링하기
+                    continue; // 이 기사 스킵하고 다음 후보 크롤링
                 }
 
+                // CrawledNews에 썸네일 URL 포함
                 return new CrawledNews(
                         titleEl.text(),
-                        contentEl.text()
+                        contentEl.text(),
+                        thumbnailImageUrl
                 );
             }
 
@@ -61,5 +69,4 @@ public class NaverNewsCrawler {
         }
     }
 
-    public record CrawledNews(String title, String content) {}
 }
