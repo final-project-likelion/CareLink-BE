@@ -29,12 +29,18 @@ public enum ErrorCode {
     CHAT_ROOM_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "채팅방을 불러오는 과정에서 오류가 발생했습니다."),
 
     // 약 정보 관련
-    USER_MEDICINE_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 id의 약이 존재하지 않습니다."),
-    MEDICINE_INTAKE_TIME_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 id의 복용 시간이 존재하지 않습니다."),
+    USER_MEDICINE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 id의 약이 존재하지 않습니다."),
+    MEDICINE_INTAKE_TIME_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 id의 복용 시간이 존재하지 않습니다."),
 
     // 컨디션 관련
-    USER_CONDITION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "해당 날짜의 컨디션 정보가 이미 존재합니다."),
-    USER_CONDITION_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 날짜의 컨디션 정보가 존재하지 않습니다."),
+    USER_CONDITION_ALREADY_EXISTS(HttpStatus.CONFLICT, "해당 날짜의 컨디션 정보가 이미 존재합니다."),
+    USER_CONDITION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 날짜의 컨디션 정보가 존재하지 않습니다."),
+
+    // 이미지 관련
+    IMAGE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다."),
+
+    // 일기 관련
+    USER_DIARY_ALREADY_EXISTS(HttpStatus.CONFLICT, "해당 날짜의 일기가 이미 존재합니다."),
 
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "잘못된 입력값입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다.");
