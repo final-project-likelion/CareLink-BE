@@ -2,6 +2,8 @@ package com.carelink.backend.global.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.carelink.backend.global.exception.BaseException;
+import com.carelink.backend.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,10 +29,9 @@ public class FileService {
 
             s3Client.putObject(AWS_BUCKET, fileName, file.getInputStream(), metadata);
             return s3Client.getUrl(AWS_BUCKET, fileName).toString();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new BaseException(ErrorCode.IMAGE_UPLOAD_ERROR);
         }
-        return null;
     }
 
 }
