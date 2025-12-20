@@ -2,6 +2,7 @@ package com.carelink.backend.user.entity;
 
 import com.carelink.backend.user.CognitiveState;
 import com.carelink.backend.userCondition.entity.UserCondition;
+import com.carelink.backend.userDiary.entity.UserDiary;
 import com.carelink.backend.userInterest.entity.UserInterest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -54,5 +55,8 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<UserCondition> userConditions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<UserDiary> userDiaries = new ArrayList<>();
 
 }
