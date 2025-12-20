@@ -42,19 +42,31 @@ public class UserDiaryService {
         return userDiary.getId();
     }
 
-    public List<MonthlyDiaryDto> getMonthlyUserDiary(Long userId, String year, String month) {
+    public MonthlyDiaryDto getMonthlyUserDiary(Long userId, String year, String month) {
         LocalDate start = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), 1);
         LocalDate end = start.plusMonths(1);
 
-        List<MonthlyDiaryDto> diaryDtos = new ArrayList<>();
+        List<MonthlyDiaryDto.DiaryDto> diaryDtos = new ArrayList<>();
         userDiaryRepository.findByDateBetweenAndUserId(userId, start, end).forEach(userDiary -> {
-            MonthlyDiaryDto dto = MonthlyDiaryDto.builder().id(userDiary.getId())
+            MonthlyDiaryDto.DiaryDto dto = MonthlyDiaryDto.DiaryDto.builder()
+                    .id(userDiary.getId())
                     .title(userDiary.getTitle())
                     .date(userDiary.getDate()).build();
             diaryDtos.add(dto);
         });
 
-        return diaryDtos;
+        int count = diaryDtos.size();
+        String message;
+        if (count <= 5)
+            message = "짧게라도 기록해 주신 마음이 정말 소중해요. 한 줄 한 줄이 기억을 지키는 큰 도움이 됩니다. 오늘의 생각을 남겨 주셔서 감사합니다.";
+        else if (count > 6 && count <= 15)
+            message = "일기를 꾸준히 써 오고 계세요. 정말 대단합니다! 기억을 챙기는 좋은 습관이 만들어지고 있어요. 차분하게 잘 이어가고 계십니다. 꾸준한 기록이 기억력 유지에 큰 도움이 됩니다.";
+        else
+            message = "기억을 지키는 훌륭한 습관을 잘 유지하고 계십니다. 이만큼 꾸준히 하신 건 쉽지 않은 일이죠! 스스로를 잘 돌보고 계신 모습이 느껴져요.";
+
+        return MonthlyDiaryDto.builder()
+                .message(message)
+                .diaries(diaryDtos).build();
     }
 
     public UserDiaryDto getUserDiary(Long userId, Long diaryId) {

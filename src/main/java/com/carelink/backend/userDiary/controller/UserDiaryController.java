@@ -33,7 +33,7 @@ public class UserDiaryController {
     public ResponseEntity<BaseResponse<?>> getMonthlyUserDiary(@AuthenticationPrincipal User user,
                                                                @RequestParam String year,
                                                                @RequestParam String month) {
-        List<MonthlyDiaryDto> monthlyUserDiary = userDiaryService.getMonthlyUserDiary(user.getId(), year, month);
+        MonthlyDiaryDto monthlyUserDiary = userDiaryService.getMonthlyUserDiary(user.getId(), year, month);
         return ResponseEntity.ok()
                 .body(BaseResponse.success(String.format("%s년 %s월의 일기를 정상적으로 불러왔습니다.", year, month), monthlyUserDiary));
     }

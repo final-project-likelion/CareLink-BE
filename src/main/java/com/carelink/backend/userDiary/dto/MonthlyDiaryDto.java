@@ -4,15 +4,24 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
 public class MonthlyDiaryDto {
 
-    private Long id;
+    private String message;
 
-    private LocalDate date;
+    private List<DiaryDto> diaries;
 
-    private String title;
+    @Data
+    @Builder
+    public static class DiaryDto {
+        private Long id;
+
+        private LocalDate date;
+
+        private String title;
+    }
 
 }
