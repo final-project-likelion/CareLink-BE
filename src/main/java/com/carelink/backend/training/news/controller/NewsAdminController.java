@@ -1,5 +1,6 @@
 package com.carelink.backend.training.news.controller;
 
+import com.carelink.backend.global.response.BaseResponse;
 import com.carelink.backend.training.news.service.DailyNewsCrawlingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +13,8 @@ public class NewsAdminController {
     private final DailyNewsCrawlingService dailyNewsCrawlingService;
 
     @PostMapping("/prepare")
-    public String prepareDailyNews() {
+    public BaseResponse<Void> prepareDailyNews() {
         dailyNewsCrawlingService.crawlDailyNews();
-        return "뉴스 크롤링 + AI 요약 완료";
+        return BaseResponse.success("뉴스 크롤링 + AI 요약 완료", null);
     }
 }
