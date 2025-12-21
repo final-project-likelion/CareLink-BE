@@ -47,7 +47,6 @@ public class ChatService {
 
         AIChatResponseDto aiChatResponseDto;
 
-        System.out.println(CHAT_API_URL);
         try {
             aiChatResponseDto =
                     restTemplate
@@ -58,6 +57,7 @@ public class ChatService {
                 throw new BaseException(ErrorCode.EXTERNAL_API_ERROR, "외부 API로부터 응답을 받아오지 못했습니다.");
 
         } catch (ResourceAccessException e) {
+            log.error("외부 API 연결 에러 - " + e.getMessage());
             throw new BaseException(ErrorCode.EXTERNAL_API_ERROR, "외부 API 연결에 실패했습니다.");
         } catch (BaseException e) {
             throw e;
