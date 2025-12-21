@@ -11,4 +11,5 @@ public interface UserSixWAnswerRepository
         extends JpaRepository<UserSixWAnswer, Long> {
 
     Optional<UserSixWAnswer> findByUserAndNews(User user, News news);
+    Optional<UserSixWAnswer> findByUserIdAndNewsId(Long userId, Long newsId);
 }

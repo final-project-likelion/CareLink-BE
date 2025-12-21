@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface ArticleSummaryAnswerRepository
         extends JpaRepository<ArticleSummaryAnswer, Long> {
     Optional<ArticleSummaryAnswer> findByNews(News news);
+    Optional<ArticleSummaryAnswer> findByNewsId(Long newsId);
 }

@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface SixWAnswerRepository extends JpaRepository<SixWAnswer, Long> {
     Optional<SixWAnswer> findByNews(News news);
+    Optional<SixWAnswer> findByNewsId(Long newsId);
 }
