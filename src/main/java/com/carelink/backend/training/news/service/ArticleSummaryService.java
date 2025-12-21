@@ -18,6 +18,7 @@ public class ArticleSummaryService {
     private final ArticleSummaryAnswerRepository articleSummaryAnswerRepository;
     private final UserArticleSummaryAnswerRepository userArticleSummaryAnswerRepository;
     private final AiSummaryScoreClient aiSummaryScoreClient;
+    private final TrainingCommandService trainingCommandService;
 
     public ArticleSummaryResultResponse submitSummary(
             User user,
@@ -26,6 +27,13 @@ public class ArticleSummaryService {
     ) {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new IllegalArgumentException("뉴스 없음"));
+
+        // 중복 제출 방지
+        if (userArticleSummaryAnswerRepository
+                .findByUserIdAndNewsId(user.getId(), newsId)
+                .isPresent()) {
+            throw new IllegalStateException("이미 요약을 제출한 기사입니다.");
+        }
 
         ArticleSummaryAnswer correct =
                 articleSummaryAnswerRepository.findByNews(news)
@@ -45,6 +53,8 @@ public class ArticleSummaryService {
                         score
                 );
         userArticleSummaryAnswerRepository.save(userAnswer);
+
+        trainingCommandService.completeTraining(user, news);
 
         return new ArticleSummaryResultResponse(
                 new ArticleSummaryContent(

@@ -1,5 +1,6 @@
 package com.carelink.backend.training.news.controller;
 
+import com.carelink.backend.global.response.BaseResponse;
 import com.carelink.backend.training.news.dto.*;
 import com.carelink.backend.training.news.service.ArticleSummaryService;
 import com.carelink.backend.user.entity.User;
@@ -15,11 +16,13 @@ public class ArticleSummaryController {
     private final ArticleSummaryService articleSummaryService;
 
     @PostMapping("/{newsId}/summary")
-    public ArticleSummaryResultResponse submitSummary(
+    public BaseResponse<ArticleSummaryResultResponse> submitSummary(
+            @AuthenticationPrincipal User user,
             @PathVariable Long newsId,
-            @RequestBody UserArticleSummarySubmitRequest request,
-            @AuthenticationPrincipal User user
+            @RequestBody UserArticleSummarySubmitRequest request
     ) {
-        return articleSummaryService.submitSummary(user, newsId, request);
+        return BaseResponse.success(
+                articleSummaryService.submitSummary(user, newsId, request)
+        );
     }
 }
