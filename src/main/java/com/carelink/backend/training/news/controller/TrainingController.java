@@ -2,7 +2,9 @@ package com.carelink.backend.training.news.controller;
 
 import com.carelink.backend.training.news.dto.*;
 import com.carelink.backend.training.news.service.TrainingQueryService;
+import com.carelink.backend.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.YearMonth;
@@ -17,20 +19,25 @@ public class TrainingController {
 
     @GetMapping("/monthly")
     public List<MonthlyTrainingResponse> getMonthlyTrainings(
-            @RequestParam Long userId,
-            @RequestParam String month // yyyy-MM
+            @AuthenticationPrincipal User user,
+            @RequestParam String month
     ) {
         return trainingQueryService.getMonthlyTrainings(
-                userId,
+                user.getId(),
                 YearMonth.parse(month)
         );
     }
 
+
     @GetMapping("/{newsId}")
     public TrainingDetailResponse getTrainingDetail(
-            @RequestParam Long userId,
+            @AuthenticationPrincipal User user,
             @PathVariable Long newsId
     ) {
-        return trainingQueryService.getTrainingDetail(userId, newsId);
+        return trainingQueryService.getTrainingDetail(
+                user.getId(),
+                newsId
+        );
     }
+
 }
