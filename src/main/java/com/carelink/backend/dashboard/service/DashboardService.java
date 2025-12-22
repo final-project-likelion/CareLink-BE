@@ -123,24 +123,38 @@ public class DashboardService {
     ) {
         int totalToday =
                 medicineIntakeTimeRepository.countByUserId(userId);
+        // 오늘 실제 복용한 횟수
+        Long doneToday =
+                medicineIntakeLogRepository.countByUserIdAndDate(userId, today);
 
-        int doneToday =
-                medicineIntakeLogRepository.countByUserIdAndDate(
-                        userId, today
-                );
+        int safeDoneToday = doneToday.intValue();
 
         boolean todayDone =
-                totalToday > 0 && totalToday == doneToday;
+                totalToday > 0 && totalToday == safeDoneToday;
 
-        int completedDays =
-                medicineIntakeLogRepository.countFullyCompletedDays(
-                        userId, weekStart, weekEnd
-                );
+        // 주간 완료 일수 (하루에 모든 복용을 완료한 날짜 수)
+        int completedDays = 0;
+
+        LocalDate cursor = weekStart;
+        while (!cursor.isAfter(weekEnd)) {
+
+            int doneCount =
+                    medicineIntakeLogRepository
+                            .findByMedicineIntakeTime_UserMedicine_User_IdAndDate(userId, cursor)
+                            .size();
+
+            if (totalToday > 0 && doneCount == totalToday) {
+                completedDays++;
+            }
+
+            cursor = cursor.plusDays(1);
+        }
 
         return new WeeklyStatusDto(
                 todayDone ? "완료" : "작성 전",
                 completedDays,
                 (int) ((completedDays / 7.0) * 100)
         );
+
     }
 }
