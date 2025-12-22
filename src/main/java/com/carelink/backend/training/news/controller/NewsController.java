@@ -1,9 +1,9 @@
 package com.carelink.backend.training.news.controller;
 
+import com.carelink.backend.global.config.CustomUserDetails;
 import com.carelink.backend.global.response.BaseResponse;
 import com.carelink.backend.training.news.dto.NewsListResponseDto;
 import com.carelink.backend.training.news.service.NewsService;
-import com.carelink.backend.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +19,11 @@ public class NewsController {
 
     @GetMapping
     public BaseResponse<NewsListResponseDto> getNewsList(
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
         return BaseResponse.success(
                 "뉴스 목록 조회 성공",
-                newsService.getTodayNewsList(user.getId())
+                newsService.getTodayNewsList(customUserDetails.getId())
         );
     }
 }

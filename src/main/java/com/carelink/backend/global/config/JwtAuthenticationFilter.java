@@ -37,11 +37,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 토큰 파싱 + 유효성 체크
                 Long id = jwtProvider.getUserIdFromToken(token);
 
-                // 인증 성공 시
-                User user = userRepository.findById(Long.valueOf(id))
-                        .orElseThrow(() -> new BadCredentialsException("토큰 내 ID에 해당하는 사용자가 존재하지 않습니다."));
+                CustomUserDetails customUserDetails = new CustomUserDetails(id);
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (BadCredentialsException e) {
@@ -52,9 +50,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 request.setAttribute("exceptionCode", ErrorCode.EXPIRED_TOKEN);
                 request.setAttribute("exceptionMessage", e.getMessage());
             }
-        } else {
-            request.setAttribute("exceptionCode", ErrorCode.AUTH_REQUIRED);
-            request.setAttribute("exceptionMessage", "토큰 인증이 필요합니다.");
         }
         filterChain.doFilter(request, response);
     }
@@ -66,6 +61,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.startsWith("/swagger-ui")
+                || path.contains("api-docs")
+                || path.startsWith("/actuator")
+                || path.startsWith("/api/signup")
+                || path.startsWith("/api/login")
+                || path.startsWith("/api/reissue")
+                || path.startsWith("/admin")
+                || path.contains("swagger");
     }
 
 }

@@ -1,12 +1,12 @@
 package com.carelink.backend.medicine.controller;
 
+import com.carelink.backend.global.config.CustomUserDetails;
 import com.carelink.backend.global.response.BaseResponse;
-import com.carelink.backend.medicine.dto.IntakeTimeAddRequestDto;
 import com.carelink.backend.medicine.dto.MedicineInfoDto;
 import com.carelink.backend.medicine.dto.MedicineUpdateRequestDto;
 import com.carelink.backend.medicine.dto.MedicineUpsertRequestDto;
 import com.carelink.backend.medicine.service.MedicineService;
-import com.carelink.backend.user.entity.User;
+import com.carelink.backend.user.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,26 +21,27 @@ import java.util.List;
 public class MedicineController {
 
     private final MedicineService medicineService;
+    private final AuthService authService;
 
     @PostMapping
     public ResponseEntity<BaseResponse<?>> addMedicine(@Valid @RequestBody MedicineUpsertRequestDto medicineUpsertRequestDto,
-                                                       @AuthenticationPrincipal User user) {
-        Long id = medicineService.addMedicine(user, medicineUpsertRequestDto);
+                                                       @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long id = medicineService.addMedicine(authService.getCurrentUser(customUserDetails.getId()), medicineUpsertRequestDto);
         return ResponseEntity.ok()
                 .body(BaseResponse.success("약을 정상적으로 추가했습니다.", id));
     }
 
     @GetMapping
-    public ResponseEntity<BaseResponse<?>> getUserMedicines(@AuthenticationPrincipal User user) {
-        List<MedicineInfoDto> medicineInfoByUserId = medicineService.getMedicineInfoByUserId(user.getId());
+    public ResponseEntity<BaseResponse<?>> getUserMedicines(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        List<MedicineInfoDto> medicineInfoByUserId = medicineService.getMedicineInfoByUserId(customUserDetails.getId());
         return ResponseEntity.ok()
                 .body(BaseResponse.success("약 목록을 정상적으로 불러왔습니다.", medicineInfoByUserId));
     }
 
     @DeleteMapping("/{medicineId}")
     public ResponseEntity<BaseResponse<?>> deleteMedicine(@PathVariable Long medicineId,
-                                                          @AuthenticationPrincipal User user) {
-        medicineService.deleteMedicine(user.getId(), medicineId);
+                                                          @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        medicineService.deleteMedicine(customUserDetails.getId(), medicineId);
         return ResponseEntity.ok()
                 .body(BaseResponse.success("약을 정상적으로 삭제했습니다.", null));
     }
@@ -48,8 +49,8 @@ public class MedicineController {
     @PutMapping("/{medicineId}")
     public ResponseEntity<BaseResponse<?>> updateMedicineInfo(@PathVariable Long medicineId,
                                                               @RequestBody MedicineUpdateRequestDto updateRequestDto,
-                                                              @AuthenticationPrincipal User user) {
-        MedicineInfoDto updatedMedicineInfo = medicineService.updateMedicineInfo(user.getId(), medicineId, updateRequestDto);
+                                                              @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        MedicineInfoDto updatedMedicineInfo = medicineService.updateMedicineInfo(customUserDetails.getId(), medicineId, updateRequestDto);
         return ResponseEntity.ok()
                 .body(BaseResponse.success("약 정보를 정상적으로 수정했습니다.", updatedMedicineInfo));
     }
