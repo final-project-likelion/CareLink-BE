@@ -1,7 +1,10 @@
 package com.carelink.backend.quiz.service;
 
+import com.carelink.backend.global.exception.BaseException;
+import com.carelink.backend.global.exception.ErrorCode;
 import com.carelink.backend.quiz.dto.*;
 import com.carelink.backend.quiz.entity.*;
+import com.carelink.backend.quiz.exception.QuizAlreadySolvedException;
 import com.carelink.backend.quiz.repository.*;
 import com.carelink.backend.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +22,17 @@ public class QuizService {
     private final QuizAttemptRepository quizAttemptRepository;
 
     public QuizResponseDto getTodayQuiz(User user) {
-        Quiz quiz = quizRepository.findByDate(LocalDate.now())
-                .orElseThrow(() -> new IllegalStateException("오늘의 퀴즈가 없습니다."));
 
-        boolean alreadySolved =
-                quizAttemptRepository.findByUserIdAndQuiz_Id(user.getId(), quiz.getId())
-                        .isPresent();
+        Quiz quiz = quizRepository.findByDate(LocalDate.now())
+                .orElseThrow(() -> new BaseException(ErrorCode.QUIZ_NOT_FOUND));
+
+        boolean alreadySolved = quizAttemptRepository
+                .findByUserIdAndQuiz_Id(user.getId(), quiz.getId())
+                .isPresent();
+
+        if (alreadySolved) {
+            throw new QuizAlreadySolvedException();
+        }
 
         return QuizResponseDto.builder()
                 .quizId(quiz.getId())
@@ -36,7 +44,6 @@ public class QuizService {
                         quiz.getOption3(),
                         quiz.getOption4()
                 ))
-                .alreadySolved(alreadySolved)
                 .build();
     }
 
@@ -51,7 +58,7 @@ public class QuizService {
         quizAttemptRepository
                 .findByUserIdAndQuiz_Id(user.getId(), quizId)
                 .ifPresent(a -> {
-                    throw new IllegalStateException("이미 푼 퀴즈입니다.");
+                    throw new QuizAlreadySolvedException();
                 });
 
         boolean isCorrect = quiz.getCorrectOption() == request.getSelectedOption();

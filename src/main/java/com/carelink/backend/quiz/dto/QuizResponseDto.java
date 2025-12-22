@@ -14,5 +14,4 @@ public class QuizResponseDto {
     private LocalDate date;
     private String question;
     private List<String> options;
-    private boolean alreadySolved;
 }
