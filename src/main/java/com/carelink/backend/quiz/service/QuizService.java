@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -23,27 +25,43 @@ public class QuizService {
 
     public QuizResponseDto getTodayQuiz(User user) {
 
-        Quiz quiz = quizRepository.findByDate(LocalDate.now())
-                .orElseThrow(() -> new BaseException(ErrorCode.QUIZ_NOT_FOUND));
+        // 1. 오늘 이미 퀴즈를 풀었으면 차단
+        boolean alreadySolvedToday =
+                quizAttemptRepository.existsByUserIdAndSolvedDate(
+                        user.getId(),
+                        LocalDate.now()
+                );
 
-        boolean alreadySolved = quizAttemptRepository
-                .findByUserIdAndQuiz_Id(user.getId(), quiz.getId())
-                .isPresent();
-
-        if (alreadySolved) {
+        if (alreadySolvedToday) {
             throw new QuizAlreadySolvedException();
         }
 
+        // 2. 퀴즈 풀(pool) 전체 조회
+        List<Quiz> quizzes = quizRepository.findAll();
+
+        if (quizzes.isEmpty()) {
+            throw new BaseException(ErrorCode.QUIZ_NOT_FOUND);
+        }
+
+        // 3. 랜덤 1개 선택
+        Quiz randomQuiz = quizzes.get(
+                ThreadLocalRandom.current().nextInt(quizzes.size())
+        );
+
+        // 4. 응답
+        LocalDate today = LocalDate.now();
+        String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"));
+
         return QuizResponseDto.builder()
-                .quizId(quiz.getId())
-                .date(quiz.getDate())
-                .question(quiz.getQuestion())
+                .quizId(randomQuiz.getId())
+                .question(randomQuiz.getQuestion())
                 .options(List.of(
-                        quiz.getOption1(),
-                        quiz.getOption2(),
-                        quiz.getOption3(),
-                        quiz.getOption4()
+                        randomQuiz.getOption1(),
+                        randomQuiz.getOption2(),
+                        randomQuiz.getOption3(),
+                        randomQuiz.getOption4()
                 ))
+                .formattedDate(formattedDate)
                 .build();
     }
 
@@ -52,29 +70,36 @@ public class QuizService {
             Long quizId,
             QuizSubmitRequestDto request
     ) {
+
+        // 1. 오늘 이미 풀었으면 차단 (조회 우회 방지)
+        if (quizAttemptRepository.existsByUserIdAndSolvedDate(
+                user.getId(),
+                LocalDate.now()
+        )) {
+            throw new QuizAlreadySolvedException();
+        }
+
+        // 2. 퀴즈 조회
         Quiz quiz = quizRepository.findById(quizId)
-                .orElseThrow();
+                .orElseThrow(() -> new BaseException(ErrorCode.QUIZ_NOT_FOUND));
 
-        quizAttemptRepository
-                .findByUserIdAndQuiz_Id(user.getId(), quizId)
-                .ifPresent(a -> {
-                    throw new QuizAlreadySolvedException();
-                });
-
+        // 3. 정답 판별
         boolean isCorrect = quiz.getCorrectOption() == request.getSelectedOption();
         int score = isCorrect ? 100 : 0;
 
+        // 4. 풀이 기록 저장
         QuizAttempt attempt = QuizAttempt.builder()
                 .userId(user.getId())
                 .quiz(quiz)
                 .selectedOption(request.getSelectedOption())
                 .isCorrect(isCorrect)
                 .score(score)
-                .solvedAt(LocalDateTime.now())
+                .solvedDate(LocalDate.now())
                 .build();
 
         quizAttemptRepository.save(attempt);
 
+        // 5. 응답
         return QuizSubmitResponseDto.builder()
                 .isCorrect(isCorrect)
                 .correctOption(quiz.getCorrectOption())
