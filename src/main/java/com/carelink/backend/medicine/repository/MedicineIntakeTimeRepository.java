@@ -2,6 +2,7 @@ package com.carelink.backend.medicine.repository;
 
 import com.carelink.backend.medicine.entity.MedicineIntakeTime;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,4 +15,12 @@ public interface MedicineIntakeTimeRepository extends JpaRepository<MedicineInta
     Optional<MedicineIntakeTime> findByUserMedicine_User_IdAndId(Long userId, Long medicineIntakeTimeId);
     void deleteByIdIn(List<Long> ids);
     Optional<MedicineIntakeTime> findByUserMedicineIdAndId(Long medicineId, Long medicineIntakeTimeId);
+
+    @Query("""
+    SELECT COUNT(t)
+    FROM MedicineIntakeTime t
+    JOIN t.userMedicine m
+    WHERE m.user.id = :userId
+    """)
+    int countByUserId(Long userId);
 }

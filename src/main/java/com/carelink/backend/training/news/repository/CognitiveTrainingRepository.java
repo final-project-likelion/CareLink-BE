@@ -24,4 +24,9 @@ public interface CognitiveTrainingRepository
             Long userId,
             Long newsId
     );
+    int countByUser_IdAndCompletedDateBetween(
+            Long userId,
+            LocalDate start,
+            LocalDate end
+    );
 }
