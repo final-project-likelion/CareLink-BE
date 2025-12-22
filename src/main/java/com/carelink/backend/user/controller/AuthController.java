@@ -52,8 +52,4 @@ public class AuthController {
                 .body(BaseResponse.success("아이디 중복 여부를 정상적으로 불러왔습니다.", phoneNumDuplicate));
     }
 
-    @GetMapping("/signup/cicd-test")
-    public String cicdTest() {
-        return "OK";
-    }
 }
