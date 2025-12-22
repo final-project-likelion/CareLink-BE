@@ -23,6 +23,8 @@ public class TrainingQueryService {
     private final ArticleSummaryAnswerRepository articleSummaryAnswerRepository;
     private final NewsRepository newsRepository;
 
+
+    // 월별 인지훈련 목록 조회
     public List<MonthlyTrainingResponse> getMonthlyTrainings(
             Long userId,
             YearMonth month
@@ -44,6 +46,51 @@ public class TrainingQueryService {
                 ))
                 .toList();
     }
+
+    // 월별 인지훈련 리포트 조회
+    public MonthlyTrainingReportResponse getMonthlyTrainingReport(
+            Long userId,
+            YearMonth month
+    ) {
+        List<MonthlyTrainingResponse> trainings =
+                getMonthlyTrainings(userId, month);
+
+        int totalCount = trainings.size();
+
+        // 점수 null 제외
+        List<Integer> scores = trainings.stream()
+                .map(MonthlyTrainingResponse::getScore)
+                .filter(score -> score != null)
+                .toList();
+
+        Double averageScore =
+                scores.isEmpty()
+                        ? null
+                        : scores.stream()
+                        .mapToInt(Integer::intValue)
+                        .average()
+                        .orElse(0.0);
+
+        Integer maxScore =
+                scores.isEmpty()
+                        ? null
+                        : scores.stream().max(Integer::compareTo).orElse(null);
+
+        MonthlyTrainingSummary summary =
+                new MonthlyTrainingSummary(
+                        totalCount,
+                        averageScore,
+                        maxScore
+                );
+
+        return new MonthlyTrainingReportResponse(
+                summary,
+                trainings
+        );
+    }
+
+
+    // 인지훈련 개별조회
     public TrainingDetailResponse getTrainingDetail(Long userId, Long newsId) {
 
         News news = newsRepository.findById(newsId)

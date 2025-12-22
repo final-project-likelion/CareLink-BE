@@ -19,12 +19,13 @@ public class TrainingController {
     private final TrainingQueryService trainingQueryService;
 
     @GetMapping("/monthly")
-    public BaseResponse<List<MonthlyTrainingResponse>> getMonthlyTrainings(
+    public BaseResponse<MonthlyTrainingReportResponse> getMonthlyTrainingReport(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @RequestParam String month
     ) {
         return BaseResponse.success(
-                trainingQueryService.getMonthlyTrainings(
+                "월별 훈련 기록 조회 성공",
+                trainingQueryService.getMonthlyTrainingReport(
                         customUserDetails.getId(),
                         YearMonth.parse(month)
                 )
