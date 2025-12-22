@@ -110,4 +110,10 @@ public class AuthService {
         return false;
     }
 
+    /** 현재 로그인한 User 객체 가져오기 */
+    public User getCurrentUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND));
+    }
+
 }
