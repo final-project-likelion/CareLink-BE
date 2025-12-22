@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   app:
+    build: .
     image: docker-springboot:latest
     ports:
       - "8080:8080"
