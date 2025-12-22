@@ -7,6 +7,7 @@ import com.carelink.backend.chat.dto.ConversationDto;
 import com.carelink.backend.global.exception.BaseException;
 import com.carelink.backend.global.exception.ErrorCode;
 import com.carelink.backend.medicine.repository.MedicineIntakeLogRepository;
+import com.carelink.backend.quiz.repository.QuizAttemptRepository;
 import com.carelink.backend.userCondition.repository.UserConditionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ public class ChatService {
 
     private final MedicineIntakeLogRepository medicineIntakeLogRepository;
     private final UserConditionRepository userConditionRepository;
+    private final QuizAttemptRepository quizAttemptRepository;
     @Value("${chat.api.url}")
     private String CHAT_API_URL;
 
@@ -82,7 +84,8 @@ public class ChatService {
         // 컨디션 체크 여부
         Boolean isConditionChecked = userConditionRepository.existsByUserIdAndDate(userId, LocalDate.now());
 
-        // TODO: 퀴즈 여부
+        // 퀴즈 여부
+        Boolean isQuizChecked = quizAttemptRepository.existsByUserIdAndSolvedDate(userId, LocalDate.now());
 
         // 채팅 내용
         List<ConversationDto> allConversationsByUserId = chatRedisService.getAllQnasByUserId(userId);
@@ -90,7 +93,7 @@ public class ChatService {
         return ChatRoomDto.builder()
                 .isMedicineChecked(isMedicineChecked)
                 .isConditionChecked(isConditionChecked)
-                .isQuizChecked(true)
+                .isQuizChecked(isQuizChecked)
                 .conversations(allConversationsByUserId).build();
     }
 
