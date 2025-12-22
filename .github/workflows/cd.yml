@@ -1,0 +1,27 @@
+name: CD - Deploy to EC2
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Github 코드 체크아웃
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. EC2에 SSH로 접속해 배포 수
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/CareLink-BE
+            git pull origin main
+            docker-compose down
+            docker-compose up -d --build
