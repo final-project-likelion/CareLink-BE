@@ -10,10 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -55,4 +52,8 @@ public class AuthController {
                 .body(BaseResponse.success("아이디 중복 여부를 정상적으로 불러왔습니다.", phoneNumDuplicate));
     }
 
+    @GetMapping("/signup/cicd-test")
+    public String cicdTest() {
+        return "OK";
+    }
 }
