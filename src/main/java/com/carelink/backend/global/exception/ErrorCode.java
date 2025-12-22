@@ -43,6 +43,10 @@ public enum ErrorCode {
     USER_DIARY_ALREADY_EXISTS(HttpStatus.CONFLICT, "해당 날짜의 일기가 이미 존재합니다."),
     USER_DIARY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 id의 일기가 존재하지 않습니다."),
 
+    // 퀴즈 관련
+    QUIZ_ALREADY_SOLVED(HttpStatus.FORBIDDEN, "오늘의 퀴즈는 이미 완료했습니다."),
+    QUIZ_NOT_FOUND(HttpStatus.NOT_FOUND, "오늘의 퀴즈가 존재하지 않습니다."),
+
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "잘못된 입력값입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다.");
 
