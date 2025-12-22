@@ -1,9 +1,9 @@
 package com.carelink.backend.training.news.controller;
 
+import com.carelink.backend.global.config.CustomUserDetails;
 import com.carelink.backend.global.response.BaseResponse;
 import com.carelink.backend.training.news.dto.*;
 import com.carelink.backend.training.news.service.TrainingQueryService;
-import com.carelink.backend.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +20,12 @@ public class TrainingController {
 
     @GetMapping("/monthly")
     public BaseResponse<List<MonthlyTrainingResponse>> getMonthlyTrainings(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @RequestParam String month
     ) {
         return BaseResponse.success(
                 trainingQueryService.getMonthlyTrainings(
-                        user.getId(),
+                        customUserDetails.getId(),
                         YearMonth.parse(month)
                 )
         );
@@ -34,12 +34,12 @@ public class TrainingController {
 
     @GetMapping("/{newsId}")
     public BaseResponse<TrainingDetailResponse> getTrainingDetail(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable Long newsId
     ) {
         return BaseResponse.success(
                 trainingQueryService.getTrainingDetail(
-                        user.getId(),
+                        customUserDetails.getId(),
                         newsId
                 )
         );

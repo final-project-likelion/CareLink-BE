@@ -12,12 +12,6 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
 
     private final Long id;
-    //private final String username;
-
-//    public CustomUserDetails(User user) {
-//        this.id = user.getId();
-//        this.username = user.getPhoneNum();
-//    }
 
     public CustomUserDetails(Long id) {
         this.id = id;
@@ -39,7 +33,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-//        return username;
         return null;
     }
 

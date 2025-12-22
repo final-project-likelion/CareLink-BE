@@ -4,8 +4,8 @@ import com.carelink.backend.chat.dto.ChatRequestDto;
 import com.carelink.backend.chat.dto.ChatRoomDto;
 import com.carelink.backend.chat.service.ChatService;
 import com.carelink.backend.chat.service.SttService;
+import com.carelink.backend.global.config.CustomUserDetails;
 import com.carelink.backend.global.response.BaseResponse;
-import com.carelink.backend.user.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,15 +30,15 @@ public class ChatController {
 
     @PostMapping("/chat")
     public ResponseEntity<BaseResponse<?>> generateResponse(@Valid @RequestBody ChatRequestDto chatRequestDto,
-                                                            @AuthenticationPrincipal User user) {
-        String response = chatService.generateResponse(user.getId(), chatRequestDto);
+                                                            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        String response = chatService.generateResponse(customUserDetails.getId(), chatRequestDto);
         return ResponseEntity.ok()
                 .body(BaseResponse.success(response));
     }
 
     @GetMapping
-    public ResponseEntity<BaseResponse<?>> getChatRoom(@AuthenticationPrincipal User user) {
-        ChatRoomDto chatRoom = chatService.getChatRoom(user.getId());
+    public ResponseEntity<BaseResponse<?>> getChatRoom(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        ChatRoomDto chatRoom = chatService.getChatRoom(customUserDetails.getId());
         return ResponseEntity.ok()
                 .body(BaseResponse.success("채팅방을 정상적으로 불러왔습니다.", chatRoom));
     }
