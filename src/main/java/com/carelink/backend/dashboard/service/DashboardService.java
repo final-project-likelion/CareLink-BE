@@ -78,9 +78,10 @@ public class DashboardService {
 
         // 5. 퀴즈
         Integer todayQuizScore =
-                quizAttemptRepository.findMaxScoreByUserIdAndSolvedDate(
-                        userId, today
-                );
+                quizAttemptRepository.findMaxScoreByUserIdAndSolvedDate(userId, today);
+
+        String todayScore =
+                todayQuizScore != null ? String.valueOf(todayQuizScore) : "-";
 
         List<DailyQuizScoreDto> quizScores =
                 quizAttemptRepository
@@ -93,7 +94,7 @@ public class DashboardService {
                         .toList();
 
         QuizSectionDto quizSection =
-                new QuizSectionDto(todayQuizScore, quizScores);
+                new QuizSectionDto(todayScore, quizScores);
 
         return new DashboardResponseDto(
                 conditionSection,
