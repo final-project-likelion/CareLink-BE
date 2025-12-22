@@ -11,7 +11,7 @@ import java.util.List;
 public class QuizResponseDto {
 
     private Long quizId;
-    private LocalDate date;
     private String question;
     private List<String> options;
+    private String formattedDate;   // "2025.12.22"
 }

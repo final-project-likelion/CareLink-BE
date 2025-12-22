@@ -6,8 +6,6 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-
 @Component
 @RequiredArgsConstructor
 public class QuizInitDataLoader {
@@ -16,12 +14,11 @@ public class QuizInitDataLoader {
 
     @PostConstruct
     public void init() {
-        // 이미 데이터가 있으면 DB에 또 추가하지 않음
+        // 이미 퀴즈가 있으면 다시 생성하지 않음
         if (quizRepository.count() > 0) return;
 
         quizRepository.save(
                 Quiz.builder()
-                        .date(LocalDate.now())
                         .question("기억력 향상에 좋은 녹색 채소는 무엇인가요?")
                         .option1("당근")
                         .option2("시금치")
@@ -33,7 +30,6 @@ public class QuizInitDataLoader {
 
         quizRepository.save(
                 Quiz.builder()
-                        .date(LocalDate.now().plusDays(1))
                         .question("1년은 몇 일일까요?")
                         .option1("365")
                         .option2("300")
@@ -45,7 +41,6 @@ public class QuizInitDataLoader {
 
         quizRepository.save(
                 Quiz.builder()
-                        .date(LocalDate.now().plusDays(2))
                         .question("세종대왕이 만든 글자는 무엇인가요?")
                         .option1("한자")
                         .option2("로마자")
@@ -57,7 +52,6 @@ public class QuizInitDataLoader {
 
         quizRepository.save(
                 Quiz.builder()
-                        .date(LocalDate.now().plusDays(3))
                         .question("치매 예방에 좋은 운동은 무엇인가요?")
                         .option1("TV 시청")
                         .option2("늦게 자기")

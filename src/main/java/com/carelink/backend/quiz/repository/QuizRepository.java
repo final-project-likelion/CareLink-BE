@@ -7,5 +7,4 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
-    Optional<Quiz> findByDate(LocalDate date);
 }

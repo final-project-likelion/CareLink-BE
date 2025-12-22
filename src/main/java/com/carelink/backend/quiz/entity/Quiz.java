@@ -16,9 +16,6 @@ public class Quiz {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private LocalDate date;   // 오늘의 퀴즈 식별
-
     @Column(nullable = false)
     private String question;
 

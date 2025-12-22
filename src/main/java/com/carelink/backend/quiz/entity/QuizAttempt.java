@@ -3,6 +3,7 @@ package com.carelink.backend.quiz.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -27,6 +28,8 @@ public class QuizAttempt {
     private boolean isCorrect;
 
     private int score;
+
+    private LocalDate solvedDate;
 
     private LocalDateTime solvedAt;
 }
