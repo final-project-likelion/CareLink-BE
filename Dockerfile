@@ -10,7 +10,7 @@ RUN ./gradlew dependencies --no-daemon
 
 COPY . .
 RUN chmod +x gradlew
-RUN ./gradlew clean build -x test --no-daemon
+RUN ./gradlew clean build -x test --no-daemon && rm -rf /root/.gradle/caches
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
