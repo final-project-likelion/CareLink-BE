@@ -4,7 +4,5 @@ import java.time.LocalDate;
 
 public record ConditionDto(
         LocalDate date,
-        Integer moodScore,
-        Integer sleepScore,
-        Integer painScore
+        Integer moodScore
 ) {}
