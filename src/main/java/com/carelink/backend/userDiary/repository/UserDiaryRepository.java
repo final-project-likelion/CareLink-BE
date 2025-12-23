@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface UserDiaryRepository extends JpaRepository<UserDiary, Long> {
     Boolean existsByUserIdAndDate(Long userId, LocalDate date);
 
+    int countByUser_IdAndDateBetween(Long userId, LocalDate start, LocalDate end);
+
     @Query("""
         SELECT ud
         FROM UserDiary ud
