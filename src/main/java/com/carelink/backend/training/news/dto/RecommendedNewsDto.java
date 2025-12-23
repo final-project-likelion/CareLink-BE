@@ -11,4 +11,5 @@ public class RecommendedNewsDto {
     private String title;
     private String thumbnailUrl;
     private int estimatedMinutes;
+    private boolean completed;
 }

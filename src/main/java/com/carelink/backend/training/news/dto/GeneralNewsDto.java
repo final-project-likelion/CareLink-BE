@@ -12,4 +12,5 @@ public class GeneralNewsDto {
     private String thumbnailUrl;
     private int estimatedMinutes;
     private String previewSummary;
+    private boolean completed;
 }
