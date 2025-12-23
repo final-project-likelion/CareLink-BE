@@ -2,6 +2,7 @@ package com.carelink.backend.dashboard.service;
 
 import com.carelink.backend.dashboard.dto.*;
 import com.carelink.backend.quiz.repository.QuizAttemptRepository;
+import com.carelink.backend.userCondition.entity.UserCondition;
 import com.carelink.backend.userCondition.repository.UserConditionRepository;
 import com.carelink.backend.userDiary.repository.UserDiaryRepository;
 import com.carelink.backend.training.news.repository.CognitiveTrainingRepository;
@@ -12,7 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +32,7 @@ public class DashboardService {
     public DashboardResponseDto getDashboard(Long userId) {
 
         LocalDate today = LocalDate.now();
-
+        LocalDate start = today.minusDays(6);
         // 최근 7일
         LocalDate last7Start = today.minusDays(6);
 
@@ -37,18 +41,25 @@ public class DashboardService {
         LocalDate weekEnd = weekStart.plusDays(6);
 
         // 1. 컨디션
-        List<ConditionDto> conditions =
+        Map<LocalDate, Integer> moodMap =
                 userConditionRepository
-                        .findByUser_IdAndDateBetween(userId, last7Start, today)
+                        .findByUser_IdAndDateBetween(userId, start, today)
                         .stream()
-                        .map(c -> new ConditionDto(
-                                c.getDate(),
-                                c.getMoodScore()
-                        ))
-                        .toList();
+                        .collect(Collectors.toMap(
+                                UserCondition::getDate,
+                                UserCondition::getMoodScore
+                        ));
+
+        List<Integer> moodScores = new ArrayList<>();
+
+        for (int i = 0; i < 7; i++) {
+            LocalDate date = start.plusDays(i);
+            moodScores.add(moodMap.getOrDefault(date, 0));
+            // 컨디션 데이터 없는 경우 0으로 채우긴 하되, 더미데이터에는 데이터가 매일 입력된 것으로 가정합시다!
+        }
 
         ConditionSectionDto conditionSection =
-                new ConditionSectionDto(conditions);
+                new ConditionSectionDto(moodScores);
 
         // 2. 일기
         WeeklyStatusDto diaryStatus =
