@@ -43,9 +43,7 @@ public class DashboardService {
                         .stream()
                         .map(c -> new ConditionDto(
                                 c.getDate(),
-                                c.getMoodScore(),
-                                c.getSleepScore(),
-                                c.getPainScore()
+                                c.getMoodScore()
                         ))
                         .toList();
 
