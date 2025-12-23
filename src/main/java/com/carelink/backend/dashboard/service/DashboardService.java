@@ -58,8 +58,26 @@ public class DashboardService {
             // 컨디션 데이터 없는 경우 0으로 채우긴 하되, 더미데이터에는 데이터가 매일 입력된 것으로 가정합시다!
         }
 
+        // 상태 계산 로직
+        double average =
+                moodScores.stream()
+                        .mapToInt(Integer::intValue)
+                        .average()
+                        .orElse(0.0);
+
+        String status;
+        if (average >= 1.2) {
+            status = "좋음";
+        } else if (average >= 0.6) {
+            status = "보통";
+        } else {
+            status = "나쁨";
+        }
+
+
         ConditionSectionDto conditionSection =
-                new ConditionSectionDto(moodScores);
+                new ConditionSectionDto(status, moodScores);
+
 
         // 2. 일기
         WeeklyStatusDto diaryStatus =
