@@ -4,6 +4,7 @@ import com.carelink.backend.training.news.dto.NewsListResponseDto;
 import com.carelink.backend.training.news.dto.RecommendedNewsDto;
 import com.carelink.backend.training.news.dto.GeneralNewsDto;
 import com.carelink.backend.training.news.entity.News;
+import com.carelink.backend.training.news.repository.CognitiveTrainingRepository;
 import com.carelink.backend.training.news.repository.NewsRepository;
 import com.carelink.backend.user.entity.User;
 import com.carelink.backend.user.repository.UserRepository;
@@ -12,8 +13,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +26,8 @@ public class NewsService {
 
     private final NewsRepository newsRepository;
     private final UserRepository userRepository;
+    private final CognitiveTrainingRepository cognitiveTrainingRepository;
+
 
     public NewsListResponseDto getTodayNewsList(Long userId) {
 
@@ -34,6 +40,11 @@ public class NewsService {
                         .map(com.carelink.backend.userInterest.entity.UserInterest::getCategory)
                         .toList();
 
+        // 오늘 완료한 뉴스 ID 목록 조회
+        Set<Long> completedNewsIds = new HashSet<>(
+                cognitiveTrainingRepository.findCompletedNewsIds(userId)
+        );
+
         // 최신 뉴스 8개 조회
         List<News> latestNews = newsRepository.findTop8ByOrderByCreatedDateDesc();
 
@@ -43,6 +54,7 @@ public class NewsService {
         for (News news : latestNews) {
 
             int estimatedMinutes = estimateReadingTime(news.getContent());
+            boolean completed = completedNewsIds.contains(news.getId());
 
             if (recommended.size() < 3 &&
                     interestedCategories.contains(news.getCategory())) {
@@ -52,7 +64,8 @@ public class NewsService {
                                 news.getId(),
                                 news.getTitle(),
                                 news.getThumbnailUrl(),
-                                estimatedMinutes
+                                estimatedMinutes,
+                                completed
                         )
                 );
             } else {
@@ -62,7 +75,8 @@ public class NewsService {
                                 news.getTitle(),
                                 news.getThumbnailUrl(),
                                 estimatedMinutes,
-                                news.getPreviewSummary()
+                                news.getPreviewSummary(),
+                                completed
                         )
                 );
             }
