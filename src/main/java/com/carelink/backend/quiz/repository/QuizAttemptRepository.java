@@ -26,4 +26,11 @@ GROUP BY q.solvedDate
             LocalDate end
     );
 
+    List<QuizAttempt> findByUserIdAndSolvedDateBetween(
+            Long userId,
+            LocalDate start,
+            LocalDate end
+    );
+    Optional<QuizAttempt> findByUserIdAndSolvedDate(Long userId, LocalDate solvedDate);
+
 }

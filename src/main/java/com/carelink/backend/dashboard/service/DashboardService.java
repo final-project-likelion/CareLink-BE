@@ -1,6 +1,7 @@
 package com.carelink.backend.dashboard.service;
 
 import com.carelink.backend.dashboard.dto.*;
+import com.carelink.backend.quiz.entity.QuizAttempt;
 import com.carelink.backend.quiz.repository.QuizAttemptRepository;
 import com.carelink.backend.userCondition.entity.UserCondition;
 import com.carelink.backend.userCondition.repository.UserConditionRepository;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -104,24 +106,42 @@ public class DashboardService {
                 buildMedicineStatus(userId, today, weekStart, weekEnd);
 
         // 5. 퀴즈
-        Integer todayQuizScore =
-                quizAttemptRepository.findMaxScoreByUserIdAndSolvedDate(userId, today);
+        // 오늘 퀴즈 시도 조회
+        Optional<QuizAttempt> todayAttempt =
+                quizAttemptRepository.findByUserIdAndSolvedDate(userId, today);
 
+        // 서버 내부용 점수 (항상 int)
+        int todayScoreValue =
+                todayAttempt.map(QuizAttempt::getScore)
+                        .orElse(0);
+
+        // 응답용 표시 값 (여기서만 "-")
         String todayScore =
-                todayQuizScore != null ? String.valueOf(todayQuizScore) : "-";
+                todayAttempt.map(a -> String.valueOf(a.getScore()))
+                        .orElse("-");
 
-        List<DailyQuizScoreDto> quizScores =
-                quizAttemptRepository
-                        .findDailyMaxScores(userId, last7Start, today)
-                        .stream()
-                        .map(r -> new DailyQuizScoreDto(
-                                (LocalDate) r[0],
-                                (Integer) r[1]
-                        ))
-                        .toList();
+        // 최근 7일 퀴즈 기록 조회
+        List<QuizAttempt> attempts =
+                quizAttemptRepository.findByUserIdAndSolvedDateBetween(userId, start, today);
 
+        // 날짜 → 점수 맵
+        Map<LocalDate, Integer> scoreMap =
+                attempts.stream()
+                        .collect(Collectors.toMap(
+                                QuizAttempt::getSolvedDate,
+                                QuizAttempt::getScore
+                        ));
+
+        // 7일 점수 배열 (과거 → 최신)
+        List<Integer> scores = new ArrayList<>();
+        for (int i = 0; i < 7; i++) {
+            LocalDate date = start.plusDays(i);
+            scores.add(scoreMap.getOrDefault(date, 0)); // 안 푼 날 = 0점
+        }
+
+        // DTO 조립
         QuizSectionDto quizSection =
-                new QuizSectionDto(todayScore, quizScores);
+                new QuizSectionDto(todayScore, scores);
 
         return new DashboardResponseDto(
                 conditionSection,
