@@ -4,6 +4,6 @@ import java.util.List;
 
 public record QuizSectionDto(
         String todayScore,   // "100" 또는 "0" 또는 "-" 반환
-        List<DailyQuizScoreDto> last7Days
+        List<Integer> scores
 ) {}
 
