@@ -1,5 +1,6 @@
 package com.carelink.backend.user.controller;
 
+import com.carelink.backend.global.config.CustomUserDetails;
 import com.carelink.backend.global.response.BaseResponse;
 import com.carelink.backend.user.dto.LoginDto;
 import com.carelink.backend.user.dto.SignUpDto;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -50,6 +52,13 @@ public class AuthController {
         Boolean phoneNumDuplicate = authService.isPhoneNumDuplicate(phoneNum);
         return ResponseEntity.ok()
                 .body(BaseResponse.success("아이디 중복 여부를 정상적으로 불러왔습니다.", phoneNumDuplicate));
+    }
+
+    @GetMapping("/username")
+    @Operation(summary = "사용자 이름 조회")
+    public ResponseEntity<BaseResponse<?>> getUsername(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok()
+                .body(BaseResponse.success(authService.getCurrentUser(customUserDetails.getId()).getName()));
     }
 
 }
