@@ -40,10 +40,16 @@ public class NewsService {
                         .map(com.carelink.backend.userInterest.entity.UserInterest::getCategory)
                         .toList();
 
-        // 오늘 완료한 뉴스 ID 목록 조회
-        Set<Long> completedNewsIds = new HashSet<>(
+        // 과거에 훈련한 뉴스 ID들
+        Set<Long> trainedNewsIds = new HashSet<>(
                 cognitiveTrainingRepository.findCompletedNewsIds(userId)
         );
+
+        // 오늘 이미 훈련 완료했는지
+        boolean todayTrainingCompleted =
+                cognitiveTrainingRepository.existsByUserIdAndCompletedDate(
+                        userId, LocalDate.now()
+                );
 
         // 최신 뉴스 8개 조회
         List<News> latestNews = newsRepository.findTop8ByOrderByCreatedDateDesc();
@@ -54,7 +60,8 @@ public class NewsService {
         for (News news : latestNews) {
 
             int estimatedMinutes = estimateReadingTime(news.getContent());
-            boolean completed = completedNewsIds.contains(news.getId());
+            boolean trained = trainedNewsIds.contains(news.getId());
+            boolean canEnterTraining = !trained && !todayTrainingCompleted;
 
             if (recommended.size() < 3 &&
                     interestedCategories.contains(news.getCategory())) {
@@ -65,7 +72,8 @@ public class NewsService {
                                 news.getTitle(),
                                 news.getThumbnailUrl(),
                                 estimatedMinutes,
-                                completed
+                                trained,
+                                canEnterTraining
                         )
                 );
             } else {
@@ -76,7 +84,8 @@ public class NewsService {
                                 news.getThumbnailUrl(),
                                 estimatedMinutes,
                                 news.getPreviewSummary(),
-                                completed
+                                trained,
+                                canEnterTraining
                         )
                 );
             }
