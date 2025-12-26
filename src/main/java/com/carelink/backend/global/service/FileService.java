@@ -24,7 +24,7 @@ public class FileService {
         try {
             String originalFileName = file.getOriginalFilename();
             String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-            String fileName = "diary/" + UUID.randomUUID() + extension;
+            String fileName = UUID.randomUUID() + extension;
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(file.getContentType());
             metadata.setContentLength(file.getSize());
