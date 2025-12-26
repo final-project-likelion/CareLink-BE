@@ -37,32 +37,54 @@ public class NewsService {
         // 유저 관심 카테고리 추출
         List<Category> interestedCategories =
                 user.getUserInterests().stream()
-                        .map(com.carelink.backend.userInterest.entity.UserInterest::getCategory)
+                        .map(i -> i.getCategory())
                         .toList();
 
-        // 과거에 훈련한 뉴스 ID들
-        Set<Long> trainedNewsIds = new HashSet<>(
-                cognitiveTrainingRepository.findCompletedNewsIds(userId)
-        );
+        // 이미 훈련한 뉴스
+        Set<Long> trainedNewsIds =
+                new HashSet<>(cognitiveTrainingRepository.findCompletedNewsIds(userId));
 
-        // 오늘 이미 훈련 완료했는지
         boolean todayTrainingCompleted =
                 cognitiveTrainingRepository.existsByUserIdAndCompletedDate(
                         userId, LocalDate.now()
                 );
 
-        // 최신 뉴스 8개 조회
-        List<News> latestNews = newsRepository.findTop8ByOrderByCreatedDateDesc();
+        // 최근 3일치 뉴스
+        LocalDate fromDate = LocalDate.now().minusDays(3);
+
+        List<News> recentNews =
+                newsRepository.findByCreatedDateGreaterThanEqualOrderByCreatedDateDesc(fromDate);
+
+
+        // 1. 관심 카테고리 뉴스 우선 추출
+        List<News> preferredNews =
+                recentNews.stream()
+                        .filter(news -> interestedCategories.contains(news.getCategory()))
+                        .limit(3) // 추천 영역은 최대 3개
+                        .toList();
+
+        // 2. 나머지 뉴스로 채우기
+        List<News> remainingNews =
+                recentNews.stream()
+                        .filter(news -> !preferredNews.contains(news))
+                        .limit(8 - preferredNews.size())
+                        .toList();
+
+        // 3. 최종 리스트 (최대 8개)
+        List<News> finalNewsList = new ArrayList<>();
+        finalNewsList.addAll(preferredNews);
+        finalNewsList.addAll(remainingNews);
 
         List<RecommendedNewsDto> recommended = new ArrayList<>();
         List<GeneralNewsDto> others = new ArrayList<>();
 
-        for (News news : latestNews) {
+        for (News news : finalNewsList) {
 
             int estimatedMinutes = estimateReadingTime(news.getContent());
             boolean trained = trainedNewsIds.contains(news.getId());
             boolean canEnterTraining = !trained && !todayTrainingCompleted;
 
+            // 추천 영역: "관심 카테고리 + 최대 3개"
             if (recommended.size() < 3 &&
                     interestedCategories.contains(news.getCategory())) {
 
@@ -76,7 +98,9 @@ public class NewsService {
                                 canEnterTraining
                         )
                 );
+
             } else {
+                // 나머지 영역
                 others.add(
                         new GeneralNewsDto(
                                 news.getId(),
@@ -96,6 +120,6 @@ public class NewsService {
 
     private int estimateReadingTime(String content) {
         int charCount = content.length();
-        return Math.max(1, charCount / 500);
+        return Math.max(1, charCount / 480);
     }
 }
