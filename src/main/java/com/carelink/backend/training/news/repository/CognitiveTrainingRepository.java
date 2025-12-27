@@ -32,6 +32,13 @@ public interface CognitiveTrainingRepository
             LocalDate end
     );
 
+    // 인지훈련 오늘 훈련 완료 관련 수정한 로직
+    boolean existsByUserIdAndCompletedTrueAndCompletedDate(
+            Long userId,
+            LocalDate date
+    );
+
+
     // 오늘 기준으로 해당 유저가 완료한 뉴스 ID 목록
     @Query("""
         select ct.news.id
