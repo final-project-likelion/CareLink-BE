@@ -51,10 +51,10 @@ public class NewsService {
                         );
 
         // 최근 3일치 뉴스
-        LocalDate fromDate = LocalDate.now().minusDays(3);
+        LocalDate fromDate = LocalDate.now().minusDays(7);
 
         List<News> recentNews =
-                newsRepository.findByCreatedDateGreaterThanEqualOrderByCreatedDateDesc(fromDate);
+                newsRepository.findAllByOrderByCreatedDateDesc();
 
 
         // 1. 관심 카테고리 뉴스 우선 추출

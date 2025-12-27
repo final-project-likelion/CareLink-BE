@@ -14,4 +14,6 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     List<News> findByCreatedDateGreaterThanEqualOrderByCreatedDateDesc(
             LocalDate fromDate
     );
+    // 날짜 조건 없이 최신순 조회
+    List<News> findAllByOrderByCreatedDateDesc();
 }
