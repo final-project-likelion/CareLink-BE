@@ -45,9 +45,10 @@ public class NewsService {
                 new HashSet<>(cognitiveTrainingRepository.findCompletedNewsIds(userId));
 
         boolean todayTrainingCompleted =
-                cognitiveTrainingRepository.existsByUserIdAndCompletedDate(
-                        userId, LocalDate.now()
-                );
+                cognitiveTrainingRepository
+                        .existsByUserIdAndCompletedTrueAndCompletedDate(
+                                userId, LocalDate.now()
+                        );
 
         // 최근 3일치 뉴스
         LocalDate fromDate = LocalDate.now().minusDays(3);
