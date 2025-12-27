@@ -26,7 +26,7 @@ public class TrainingNewsService {
         }
 
         // 2. 하루 1회 제한
-        if (trainingRepository.existsByUserIdAndCompletedDate(
+        if (trainingRepository.existsByUserIdAndCompletedTrueAndCompletedDate(
                 user.getId(), LocalDate.now())) {
             throw new IllegalStateException("오늘은 이미 인지훈련을 완료했습니다.");
         }
