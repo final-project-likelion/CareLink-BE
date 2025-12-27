@@ -19,7 +19,7 @@ public class NaverNewsCrawler {
 
             Document listDoc = Jsoup.connect(listUrl)
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-                    .timeout(5000)
+                    .timeout(200000)
                     .get();
 
             // 여러 개 후보 기사 가져오기
